@@ -1,4 +1,6 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from typing import List
+
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from config import settings
 
 def start_callback_reply() -> ReplyKeyboardMarkup:
