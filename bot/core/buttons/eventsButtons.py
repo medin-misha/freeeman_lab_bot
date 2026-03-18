@@ -22,7 +22,7 @@ def analysis_reply() -> ReplyKeyboardMarkup:
 
 def analysis_inline() -> InlineKeyboardMarkup:
     button_lines: List[InlineKeyboardButton] = [
-        [InlineKeyboardButton(text="Аудиофай скидывать сюда", url="https://forms.yandex.ru/u/69ba72a45056906410386a58")],
+        [InlineKeyboardButton(text="Аудиофайл скидывать сюда", url="https://forms.yandex.ru/u/69ba72a45056906410386a58")],
     ]
 
     markup = InlineKeyboardMarkup(inline_keyboard=button_lines)
@@ -42,7 +42,11 @@ def analysis2_reply() -> ReplyKeyboardMarkup:
 
 def handling_inline() -> InlineKeyboardMarkup:
     button_lines: List[List[InlineKeyboardButton]] = [
-        [InlineKeyboardButton(text="ОТЗЫВЫ", url="https://t.me/alexfreemanlifelab/511")],
+        [InlineKeyboardButton(text="🟨ОТЗЫВЫ🟨", url="https://t.me/+tB1WBUwmP-FkOWIy")],
+        [
+            InlineKeyboardButton(text="Платный разбор", url="https://t.me/+tB1WBUwmP-FkOWIy"),
+            InlineKeyboardButton(text="Бесплатный разбор", url="https://t.me/+tB1WBUwmP-FkOWIy")
+        ],
     ]
 
     markup = InlineKeyboardMarkup(inline_keyboard=button_lines)
