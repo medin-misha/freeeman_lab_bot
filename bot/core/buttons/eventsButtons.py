@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardBu
 
 def mashtab_inline() -> InlineKeyboardMarkup:
     button_lines: List[InlineKeyboardButton] = [
-        [InlineKeyboardButton(text="🟨Оставить обратную связь🟨", url="https://t.me/alexfreemanlifelab/511"),],
+        [InlineKeyboardButton(text="🟨Оставить обратную связь🟨", url="https://t.me/+tB1WBUwmP-FkOWIy"),],
     ]
 
     markup = InlineKeyboardMarkup(inline_keyboard=button_lines)
