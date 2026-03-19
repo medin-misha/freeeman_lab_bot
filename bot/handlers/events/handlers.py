@@ -58,8 +58,3 @@ async def razbor_handler(msg: types.Message, bot: Bot):
         text=settings.message.text.get("handling"),
         reply_markup=handling_inline(),
     )
-    await msg.answer(
-        text="Выбери формат разбора.",
-        reply_markup=handling_reply(),
-    )
-
