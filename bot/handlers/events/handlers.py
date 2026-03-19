@@ -31,13 +31,13 @@ async def mashtab_handler(msg: types.Message, bot: Bot):
         text=settings.message.text.get("scale"),
         reply_markup=mashtab_inline()
     )
-    # await msg.answer(
-    #     text=settings.message.text.get("scale2"),
-    #     reply_markup=analysis_reply()
-    # )
+    await msg.answer(
+        text=settings.message.text.get("scale2"),
+        reply_markup=analysis_reply()
+    )
 
 
-# @router.message(F.text.lower() == "диагностика")
+@router.message(F.text.lower() == "диагностика")
 @check_sub_channel_dec
 async def analysis_handler(msg: types.Message, bot: Bot):
         await msg.reply(
@@ -51,15 +51,15 @@ async def analysis_handler(msg: types.Message, bot: Bot):
             text=settings.message.text.get("analysis2"), reply_markup=analysis2_reply()
         )
 
-# @router.message(F.text.lower() == "разбор")
+@router.message(F.text.lower() == "разбор")
 @check_sub_channel_dec
 async def razbor_handler(msg: types.Message, bot: Bot):
     await msg.answer(
         text=settings.message.text.get("handling"),
         reply_markup=handling_inline(),
     )
-    # await msg.answer(
-    #     text="Выбери формат разбора.",
-    #     reply_markup=handling_reply(),
-    # )
+    await msg.answer(
+        text="Выбери формат разбора.",
+        reply_markup=handling_reply(),
+    )
 
