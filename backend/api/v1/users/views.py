@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from constracts import UserCreate, UserRead, UserUpdate
+from contracts.user import UserCreate, UserRead, UserUpdate
 from core import database
 from core.models import User
 from service import CRUD

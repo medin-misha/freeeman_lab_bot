@@ -56,3 +56,53 @@ class DBErrorHandler:
             )
 
 
+class S3ErrorHandler:
+    """
+    💡 Универсальный обработчик ошибок S3 (botocore).
+    """
+
+    @staticmethod
+    def handle(err: Exception, action: str = "processing") -> None:
+        """
+        Обрабатывает исключения botocore и выбрасывает HTTPException.
+        """
+        from botocore.exceptions import ClientError, EndpointConnectionError
+
+        if isinstance(err, EndpointConnectionError):
+            logger.error(f"S3 connection error during {action}: {err}")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="S3 storage is temporarily unavailable. Please try again later.",
+            )
+
+        elif isinstance(err, ClientError):
+            error_code = err.response.get("Error", {}).get("Code")
+            logger.warning(f"S3 ClientError ({error_code}) during {action}: {err}")
+
+            if error_code == "NoSuchBucket":
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Storage configuration error: Bucket not found.",
+                )
+            elif error_code in ("AccessDenied", "AllAccessDisabled"):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Access to storage denied.",
+                )
+            elif error_code == "NoSuchKey":
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="File not found in storage.",
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"S3 storage error: {error_code or 'Unknown'}",
+                )
+
+        else:
+            logger.exception(f"Unexpected S3 error during {action}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Internal server error during storage operation.",
+            )
