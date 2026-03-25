@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     token: str = Field(validation_alias="TOKEN")
     api_url: str = Field(validation_alias="API_URL")
     channel_id: str = Field(validation_alias="CHANNEL_ID")
+    rmq_url: str = Field(validation_alias="RMQ_URL")
+    diagnostic_response_queue: str = Field(
+        validation_alias="RMQ_DIAGNOSTIC_RESPONSE_QUEUE"
+    )
     message: Messages = Messages()
     files: Files = Files()
 

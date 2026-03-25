@@ -4,15 +4,19 @@ from aiogram import Router, types
 from aiogram.filters import CommandStart
 
 from config import settings
-from core.buttons import start_inline
+from core.buttons import start_inline_keyboard
 from core.utils import UserAPI
 
 router = Router(name="system")
 user_api = UserAPI()
 
+
 @router.message(CommandStart())
 async def start_handler(msg: types.Message) -> None:
-    await msg.answer(settings.message.text.get("start"), reply_markup=start_inline())
+    await msg.answer(
+        settings.message.text.get("start"),
+        reply_markup=start_inline_keyboard(),
+    )
     user = msg.from_user
 
     if user is not None:

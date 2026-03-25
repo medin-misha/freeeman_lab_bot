@@ -1,6 +1,7 @@
 from functools import wraps
 
-from core.buttons import start_inline
+from core.buttons import start_inline_keyboard
+
 from .funcs import check_sub_channel
 
 
@@ -15,7 +16,7 @@ def check_sub_channel_dec(func):
 
         await msg.answer(
             text="Нужно войти в сообщество",
-            reply_markup=start_inline(),
+            reply_markup=start_inline_keyboard(),
         )
 
     return wrapped_func
