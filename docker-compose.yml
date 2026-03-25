@@ -33,6 +33,29 @@ services:
     networks:
       - freeeman-network
     restart: unless-stopped
+  admin-bot:
+    build:
+      context: ./admin-bot
+      dockerfile: Dockerfile
+    container_name: freeeman_admin_bot
+    env_file:
+      - ./admin-bot/.env
+    networks:
+      - freeeman-network
+    restart: unless-stopped
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web Console
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: supersecretpassword
+    volumes:
+      - ./minio-data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
 
 networks:
   freeeman-network:

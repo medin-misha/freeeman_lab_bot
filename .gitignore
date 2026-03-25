@@ -143,6 +143,7 @@ rabbitmq-data/
 
 # ActiveMQ
 activemq-data/
+minio-data/
 
 # SageMath parsed files
 *.sage.py
