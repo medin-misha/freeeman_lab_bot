@@ -1,7 +1,63 @@
 from aiobotocore.session import get_session
 from contextlib import asynccontextmanager
+import re
+import unicodedata
 from .error_handlers import S3ErrorHandler
 from config import settings
+
+
+CYRILLIC_TO_LATIN = {
+    "а": "a",
+    "б": "b",
+    "в": "v",
+    "г": "g",
+    "д": "d",
+    "е": "e",
+    "ё": "e",
+    "ж": "zh",
+    "з": "z",
+    "и": "i",
+    "й": "y",
+    "к": "k",
+    "л": "l",
+    "м": "m",
+    "н": "n",
+    "о": "o",
+    "п": "p",
+    "р": "r",
+    "с": "s",
+    "т": "t",
+    "у": "u",
+    "ф": "f",
+    "х": "h",
+    "ц": "ts",
+    "ч": "ch",
+    "ш": "sh",
+    "щ": "sch",
+    "ъ": "",
+    "ы": "y",
+    "ь": "",
+    "э": "e",
+    "ю": "yu",
+    "я": "ya",
+}
+
+
+def _transliterate_to_s3_safe(value: str | None, allow_slash: bool = False) -> str:
+    if not value:
+        return ""
+
+    transliterated = "".join(
+        CYRILLIC_TO_LATIN.get(char.lower(), char) for char in value
+    )
+    normalized = unicodedata.normalize("NFKD", transliterated).encode(
+        "ascii", "ignore"
+    ).decode("ascii")
+
+    allowed_pattern = r"[^A-Za-z0-9._/-]+" if allow_slash else r"[^A-Za-z0-9._-]+"
+    sanitized = re.sub(allowed_pattern, "_", normalized)
+    sanitized = re.sub(r"_+", "_", sanitized).strip("._/")
+    return sanitized
 
 
 class S3Client:
@@ -28,7 +84,13 @@ class S3Client:
     async def upload_file(
         self, file: bytes, object_name: str, folder: str = None, filename: str = None
     ):
-        key = f"{folder}/{object_name}{filename}"
+        safe_folder = _transliterate_to_s3_safe(folder, allow_slash=True)
+        safe_object_name = _transliterate_to_s3_safe(object_name)
+        safe_filename = _transliterate_to_s3_safe(filename)
+
+        key = f"{safe_object_name}{safe_filename}"
+        if safe_folder:
+            key = f"{safe_folder}/{key}"
         try:
             async with self.get_client() as client:
                 await client.put_object(

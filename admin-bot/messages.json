@@ -1,0 +1,18 @@
+{
+    "start": "Admin bot active",
+    "notifications": {
+        "diagnostic_request": "Пользователь ({display_name}) хочет пройти диагностику"
+    },
+    "diagnostics": {
+        "wait_for_result_file": "Жду файл диагностики для этого пользователя.",
+        "invalid_attachment": "Ожидаю файл диагностики документом",
+        "result_saved": "Файл диагностики сохранен.",
+        "result_save_error": "Не удалось сохранить файл диагностики. Попробуйте отправить файл еще раз."
+    },
+    "buttons": {
+        "send_result": "Отправить результат"
+    },
+    "callback": {
+        "send_result": "send_result"
+    }
+}

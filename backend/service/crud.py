@@ -230,6 +230,24 @@ class CRUD:
             DBErrorHandler.handle(err=err, model=model, action="deleting")
     
     @staticmethod
+    async def bulk_create(
+        data: list[SchemaT], model: Type[ModelT], session: AsyncSession
+    ) -> list[ModelT]:
+        instances = [model(**item.model_dump()) for item in data]
+        try:
+            session.add_all(instances)
+            await session.commit()
+            for instance in instances:
+                await session.refresh(instance)
+        except HTTPException:
+            raise
+        except Exception as err:
+            await session.rollback()
+            DBErrorHandler.handle(err=err, model=model)
+        else:
+            return instances
+
+    @staticmethod
     def parse_value(column, raw_value: str):
         column_type = column.type
         boolean_map = {

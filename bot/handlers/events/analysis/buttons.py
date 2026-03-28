@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 
 
 PAID_ANALYSIS_URL = (
@@ -26,3 +26,11 @@ def analysis_format_inline_keyboard() -> InlineKeyboardMarkup:
             ],
         ]
     )
+
+def wording_of_request_for_analysis_inline_keyboard() -> InlineKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Я готов к разбору!")],
+        ],
+    )
+    

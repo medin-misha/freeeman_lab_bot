@@ -46,6 +46,11 @@ async def patch_user(id: int, data: UserUpdate, session: SessionDepends) -> User
     return await CRUD.patch(new_data=data, model=User, session=session, id=id)
 
 
+@router.post("/bulk", response_model=list[UserRead], status_code=status.HTTP_201_CREATED)
+async def bulk_create_users(data: list[UserCreate], session: SessionDepends) -> list[User]:
+    return await CRUD.bulk_create(data=data, model=User, session=session)
+
+
 @router.delete("/{id}", response_model=str, status_code=status.HTTP_200_OK)
 async def delete_user(id: int, session: SessionDepends) -> str:
     return await CRUD.delete(model=User, session=session, id=id)

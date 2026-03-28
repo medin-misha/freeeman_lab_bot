@@ -8,9 +8,10 @@ WORKDIR /app
 
 COPY --from=ghcr.io/astral-sh/uv:0.7.22 /uv /uvx /bin/
 
-COPY pyproject.toml README.md ./
-RUN uv sync --no-dev --no-install-project
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
 
+COPY .env .env
 COPY . .
 
 CMD ["uv", "run", "python", "main.py"]

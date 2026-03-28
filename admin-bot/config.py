@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from pydantic import Field, field_validator
@@ -5,6 +6,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 BASE_DIR = Path(__file__).resolve().parent
+
+
+class Messages:
+    with open(BASE_DIR / "messages.json", "r", encoding="utf-8") as f:
+        text: dict = json.load(f)
 
 
 class Settings(BaseSettings):
@@ -21,6 +27,7 @@ class Settings(BaseSettings):
         validation_alias="RMQ_DIAGNOSTIC_REQUEST_QUEUE"
     )
     chat_ids: str = Field(validation_alias="CHAT_IDS")
+    message: Messages = Messages()
 
     @field_validator("chat_ids")
     @classmethod
@@ -32,7 +39,11 @@ class Settings(BaseSettings):
 
     @property
     def chat_ids_list(self) -> list[int]:
-        return [int(chat_id.strip()) for chat_id in self.chat_ids.split(",") if chat_id.strip()]
+        return [
+            int(chat_id.strip())
+            for chat_id in self.chat_ids.split(",")
+            if chat_id.strip()
+        ]
 
 
 settings = Settings()

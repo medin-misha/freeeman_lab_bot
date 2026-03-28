@@ -1,9 +1,9 @@
 services:
-  backend:
+  freeman-backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: freeeman_backend
+    container_name: freeman_backend
     env_file:
       - ./backend/.env
     ports:
@@ -18,7 +18,7 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  bot:
+  freeman-bot:
     build:
       context: ./bot
       dockerfile: Dockerfile
@@ -26,14 +26,14 @@ services:
     env_file:
       - ./bot/.env
     environment:
-      API_URL: http://backend:8000
+      API_URL: http://freeman-backend:8000
     depends_on:
-      backend:
+      freeman-backend:
         condition: service_healthy
     networks:
       - freeeman-network
     restart: unless-stopped
-  admin-bot:
+  freeman-admin-bot:
     build:
       context: ./admin-bot
       dockerfile: Dockerfile
@@ -43,9 +43,9 @@ services:
     networks:
       - freeeman-network
     restart: unless-stopped
-  minio:
+  freeman-minio:
     image: quay.io/minio/minio
-    container_name: minio
+    container_name: freeman-minio
     ports:
       - "9000:9000"   # S3 API
       - "9001:9001"   # Web Console
