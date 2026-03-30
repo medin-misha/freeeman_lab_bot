@@ -27,7 +27,7 @@ services:
     build:
       context: ./bot
       dockerfile: Dockerfile
-    container_name: freeeman_bot
+    container_name: freeman_bot
     env_file:
       - ./bot/.env
     environment:

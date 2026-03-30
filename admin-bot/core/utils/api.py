@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import mimetypes
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -112,11 +113,14 @@ class FileAPI(API):
                     "Content-Type",
                     "application/octet-stream",
                 )
+                filename = self._extract_filename(
+                    response.headers.get("Content-Disposition")
+                )
 
         return DownloadedFile(
             content=content,
             content_type=content_type,
-            filename=self._build_filename(file_id, content_type),
+            filename=filename or self._build_filename(file_id, content_type),
         )
 
     async def upload_file(
@@ -147,6 +151,17 @@ class FileAPI(API):
         mime_type = content_type.partition(";")[0].strip()
         extension = mimetypes.guess_extension(mime_type) or ".bin"
         return f"voice_{file_id}{extension}"
+
+    def _extract_filename(self, content_disposition: str | None) -> str | None:
+        if not content_disposition:
+            return None
+
+        match = re.search(r'filename="?(?P<filename>[^";]+)"?', content_disposition)
+        if match is None:
+            return None
+
+        filename = match.group("filename").strip()
+        return filename or None
 
 
 class DiagnosticsAPI(API):

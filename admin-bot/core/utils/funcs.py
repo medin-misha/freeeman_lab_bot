@@ -1,9 +1,50 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
+import re
 from typing import Any
+from urllib.parse import unquote
+import unicodedata
 
 from aiogram.types import Message
+
+
+CYRILLIC_TO_LATIN = {
+    "а": "a",
+    "б": "b",
+    "в": "v",
+    "г": "g",
+    "д": "d",
+    "е": "e",
+    "ё": "e",
+    "ж": "zh",
+    "з": "z",
+    "и": "i",
+    "й": "j",
+    "к": "k",
+    "л": "l",
+    "м": "m",
+    "н": "n",
+    "о": "o",
+    "п": "p",
+    "р": "r",
+    "с": "s",
+    "т": "t",
+    "у": "u",
+    "ф": "f",
+    "х": "h",
+    "ц": "ts",
+    "ч": "ch",
+    "ш": "sh",
+    "щ": "sch",
+    "ъ": "",
+    "ы": "y",
+    "ь": "",
+    "э": "e",
+    "ю": "yu",
+    "я": "ya",
+}
 
 
 @dataclass(slots=True)
@@ -123,7 +164,8 @@ def _coerce_int(value: object) -> int | None:
 
 def _coerce_filename(value: object, file_id: str, fallback: str) -> str:
     if isinstance(value, str) and value.strip():
-        return value.strip()
+        normalized = _normalize_upload_filename(value.strip())
+        return normalized or fallback or f"file_{file_id}"
 
     return fallback if fallback else f"file_{file_id}"
 
@@ -133,3 +175,29 @@ def _coerce_content_type(value: object, fallback: str) -> str:
         return value.strip()
 
     return fallback
+
+
+def _normalize_upload_filename(filename: str) -> str:
+    decoded = _decode_percent_encoded_filename(filename)
+    path = Path(decoded)
+    extension = "".join(path.suffixes).lower()
+    stem = path.name[: -len(extension)] if extension else path.name
+
+    transliterated = "".join(
+        CYRILLIC_TO_LATIN.get(char.lower(), char) for char in stem
+    )
+    normalized = unicodedata.normalize("NFKD", transliterated).encode(
+        "ascii",
+        "ignore",
+    ).decode("ascii")
+    slug = re.sub(r"[^A-Za-z0-9]+", "-", normalized.lower())
+    slug = re.sub(r"-+", "-", slug).strip("-") or "file"
+    return f"{slug}{extension}"
+
+
+def _decode_percent_encoded_filename(filename: str) -> str:
+    if "%" not in filename:
+        return filename
+
+    decoded = unquote(filename)
+    return decoded if decoded else filename

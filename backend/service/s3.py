@@ -1,5 +1,6 @@
 from aiobotocore.session import get_session
 from contextlib import asynccontextmanager
+from pathlib import Path
 import re
 import unicodedata
 from .error_handlers import S3ErrorHandler
@@ -17,7 +18,7 @@ CYRILLIC_TO_LATIN = {
     "ж": "zh",
     "з": "z",
     "и": "i",
-    "й": "y",
+    "й": "j",
     "к": "k",
     "л": "l",
     "м": "m",
@@ -60,6 +61,63 @@ def _transliterate_to_s3_safe(value: str | None, allow_slash: bool = False) -> s
     return sanitized
 
 
+def _slugify_filename(filename: str | None) -> str:
+    if not filename:
+        return ""
+
+    path = Path(filename)
+    extension = "".join(path.suffixes)
+    stem = path.name[: -len(extension)] if extension else path.name
+    stem = _decode_hex_like_filename(stem)
+
+    transliterated = "".join(
+        CYRILLIC_TO_LATIN.get(char.lower(), char) for char in stem
+    )
+    normalized = unicodedata.normalize("NFKD", transliterated).encode(
+        "ascii", "ignore"
+    ).decode("ascii")
+
+    slug = re.sub(r"[^A-Za-z0-9]+", "-", normalized.lower())
+    slug = re.sub(r"-+", "-", slug).strip("-") or "file"
+    return f"{slug}{extension}"
+
+
+def build_download_filename(filename: str | None) -> str:
+    return _slugify_filename(filename)
+
+
+def _decode_hex_like_filename(value: str) -> str:
+    parts = value.split("_")
+    hex_tokens = [part for part in parts if re.fullmatch(r"[0-9a-fA-F]{2}", part)]
+    if len(hex_tokens) < 4:
+        return value
+
+    decoded_parts: list[str] = []
+    byte_buffer = bytearray()
+
+    def flush_bytes() -> None:
+        if not byte_buffer:
+            return
+
+        try:
+            decoded_parts.append(byte_buffer.decode("utf-8"))
+        except UnicodeDecodeError:
+            decoded_parts.extend(f"{byte:02x}" for byte in byte_buffer)
+        finally:
+            byte_buffer.clear()
+
+    for part in parts:
+        if re.fullmatch(r"[0-9a-fA-F]{2}", part):
+            byte_buffer.append(int(part, 16))
+            continue
+
+        flush_bytes()
+        decoded_parts.append(part)
+
+    flush_bytes()
+    return "".join(decoded_parts)
+
+
 class S3Client:
     def __init__(
         self,
@@ -84,9 +142,10 @@ class S3Client:
     async def upload_file(
         self, file: bytes, object_name: str, folder: str = None, filename: str = None
     ):
+    
         safe_folder = _transliterate_to_s3_safe(folder, allow_slash=True)
         safe_object_name = _transliterate_to_s3_safe(object_name)
-        safe_filename = _transliterate_to_s3_safe(filename)
+        safe_filename = _slugify_filename(filename)
 
         key = f"{safe_object_name}{safe_filename}"
         if safe_folder:
