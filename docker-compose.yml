@@ -73,6 +73,23 @@ services:
       - freeeman-network
     restart: unless-stopped
 
+  freeman-minio-init:
+    image: minio/mc
+    container_name: freeman-minio-init
+    depends_on:
+      - freeman-minio
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until mc alias set local http://freeman-minio:9000 "${MINIO_ROOT_USER:-admin}" "${MINIO_ROOT_PASSWORD:-supersecretpassword}" >/dev/null 2>&1; do
+          sleep 1
+        done
+        mc mb --ignore-existing local/freeman-bucket
+    networks:
+      - freeeman-network
+    restart: "no"
+
 networks:
   freeeman-network:
     driver: bridge
