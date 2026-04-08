@@ -6,6 +6,8 @@ from config import settings
 from handlers.events.diagnostics import broker as diagnostic_broker
 from handlers.events.diagnostics import set_bot_instance as set_diagnostic_bot_instance
 
+logger = logging.getLogger(__name__)
+
 BOT_TOKEN = settings.token
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -13,13 +15,21 @@ dp = Dispatcher()
 
 async def main():
     logging.basicConfig(level=logging.DEBUG)
-    dp.include_router(main_router)
-    set_diagnostic_bot_instance(bot)
-    await diagnostic_broker.start()
     try:
-        await dp.start_polling(bot)
-    finally:
-        await diagnostic_broker.close()
+        dp.include_router(main_router)
+        set_diagnostic_bot_instance(bot)
+        await diagnostic_broker.start()
+        try:
+            await dp.start_polling(bot)
+        finally:
+            await diagnostic_broker.close()
+    except Exception:
+        logger.exception("Critical error, bot stopped")
+        raise
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception:
+        logging.exception("Bot process terminated with error")

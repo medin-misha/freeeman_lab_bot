@@ -9,5 +9,6 @@
     "callback": {
         "check_subscribe": "check_subscribe",
         "send_file": "send_file"
-    }
+    },
+    "error": "Что-то пошло не так. Попробуй ещё раз или напиши /start для перезапуска. \n\nЕсли не помогает напиши в поддержку @it_was_I_misha"
 }
