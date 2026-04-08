@@ -4,6 +4,7 @@ import re
 from pathlib import PurePosixPath
 
 from fastapi import Response, UploadFile
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from contracts.files.schemas import FileCreate, FileReturn
@@ -27,6 +28,11 @@ async def create_file(
         filename=file.filename,
     )
     return await CRUD.create(session=session, model=File, data=FileCreate(link=link))
+
+
+async def get_files(session: AsyncSession) -> list[File]:
+    result = await session.execute(select(File).order_by(File.id))
+    return list(result.scalars().all())
 
 
 async def get_file_by_id(session: AsyncSession, file_id: int) -> Response:

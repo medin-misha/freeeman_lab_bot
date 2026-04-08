@@ -3,12 +3,13 @@ from aiogram.types import CallbackQuery
 
 from config import settings
 from core.buttons import start_reply_keyboard
-from core.utils import check_sub_channel
+from core.utils import check_sub_channel, ensure_user_registered
 
 router = Router(name="system_callbacks")
 
 
 @router.callback_query(F.data == settings.message.text.get("callback").get("check_subscribe"))
+@ensure_user_registered
 async def check_subscribe_callback(query: CallbackQuery, bot: Bot):
     if await check_sub_channel(bot=bot, user_id=query.from_user.id):
         await query.answer(text="Теперь напиши МАСШТАБ")

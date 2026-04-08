@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
 from core.database import database
-from service.files.crud import create_file, get_file_by_id
+from service.files.crud import create_file, get_file_by_id, get_files
 from contracts.files.schemas import FileReturn
 
 router = APIRouter(prefix="/files", tags=["files"])
@@ -22,6 +22,11 @@ async def upload_file_view(
     Загрузка файла в S3 и сохранение ссылки в БД.
     """
     return await create_file(session=session, file=file, folder=folder)
+
+
+@router.get("/", response_model=list[FileReturn])
+async def get_files_view(session: SessionDep) -> list[FileReturn]:
+    return await get_files(session=session)
 
 
 @router.get("/{file_id}")

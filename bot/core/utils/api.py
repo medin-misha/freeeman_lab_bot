@@ -8,7 +8,7 @@ from typing import Any
 
 import aiohttp
 from aiogram import Bot
-from aiogram.types import Voice
+from aiogram.types import Voice, User
 
 from config import settings
 
@@ -136,6 +136,27 @@ class FileAPI(API):
         return filename or None
 
 
+async def get_or_create_user(chat_id: str, from_user: User, user_api: UserAPI) -> dict[str, Any]:
+    """
+    Возвращает пользователя из БД по chat_id.
+    Если пользователь не найден — регистрирует его и возвращает созданного.
+    """
+    users = await user_api.get_user_bi_chat_id(chat_id)
+    if users:
+        return users[0]
+
+    await user_api.add_user(
+        username=from_user.username,
+        email=None,
+        phone=None,
+        first_name=from_user.first_name,
+        last_name=from_user.last_name,
+        chat_id=str(from_user.id),
+    )
+    users = await user_api.get_user_bi_chat_id(chat_id)
+    return users[0]
+
+
 class DiagnosticsAPI(API):
     async def voice_to_bytes(self, voice: Voice, bot: Bot):
         if voice is None:
@@ -151,15 +172,16 @@ class DiagnosticsAPI(API):
         voice: Voice,
         bot: Bot,
         chat_id: str,
+        from_user: User,
     ) -> dict[str, Any]:
         user_api = UserAPI()
-        user = await user_api.get_user_bi_chat_id(chat_id)
+        user = await get_or_create_user(chat_id=chat_id, from_user=from_user, user_api=user_api)
         file_api = FileAPI()
         file_bytes: bytes = await self.voice_to_bytes(voice, bot)
         file = await file_api.upload_file(file_bytes, "voice_message.ogg", "audio/ogg")
         payload = {
             "file_id": file["id"],
-            "user_id": user[0]["id"],
+            "user_id": user["id"],
         }
         return await self.post("/diagnostics", payload)
 

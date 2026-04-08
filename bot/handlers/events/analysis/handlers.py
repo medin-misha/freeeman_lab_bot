@@ -9,11 +9,13 @@ from .buttons import (
     schedule_inline_keyboard,
     wording_of_request_for_analysis_inline_keyboard,
 )
+from core.utils import ensure_user_registered
 
 router = Router(name="analysis_handlers")
 
 
 @router.message(F.text.lower() == "разбор")
+@ensure_user_registered
 async def analysis_entry_handler(msg: Message) -> None:
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_document")
     await msg.bot.send_document(
@@ -24,6 +26,7 @@ async def analysis_entry_handler(msg: Message) -> None:
     )
 
 @router.message(F.text.lower() == "я готов к разбору!")
+@ensure_user_registered
 async def analysis_options_handler(msg: Message) -> None:
     await msg.answer(
         text=settings.message.text.get("handler"),
@@ -36,6 +39,7 @@ async def analysis_options_handler(msg: Message) -> None:
 
 
 @router.message(F.text.lower() == FORM_FILLED_TEXT.lower())
+@ensure_user_registered
 async def analysis_form_filled_handler(msg: Message) -> None:
     await msg.answer(
         text="Внеси, пожалуйста, своё имя и фамилию в расписание по кнопке ниже.",
