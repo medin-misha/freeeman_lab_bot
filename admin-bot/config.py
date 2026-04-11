@@ -22,6 +22,11 @@ class Settings(BaseSettings):
 
     token: str = Field(validation_alias="TOKEN")
     api_url: str = Field(validation_alias="API_URL")
+    api_timeout_seconds: int = Field(
+        default=600,
+        validation_alias="API_TIMEOUT_SECONDS",
+    )
+    telegram_bot_api_url: str = Field(validation_alias="TELEGRAM_BOT_API_URL")
     rmq_url: str = Field(validation_alias="RMQ_URL")
     diagnostic_request_queue: str = Field(
         validation_alias="RMQ_DIAGNOSTIC_REQUEST_QUEUE"

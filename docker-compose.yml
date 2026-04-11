@@ -1,4 +1,18 @@
 services:
+  telegram-bot-api:
+    image: aiogram/telegram-bot-api:latest
+    environment:
+      - TELEGRAM_API_ID=39825758
+      - TELEGRAM_API_HASH=bb7a910b15bb2c9d49da9efc586a668d
+      - TELEGRAM_LOCAL=1
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./telegram-bot-api-data:/var/lib/telegram-bot-api
+    networks:
+      - freeeman-network
+    restart: unless-stopped
+
   freeman-backend:
     build:
       context: ./backend
@@ -35,6 +49,10 @@ services:
     depends_on:
       freeman-backend:
         condition: service_healthy
+      telegram-bot-api:
+        condition: service_started
+    volumes:
+      - ./telegram-bot-api-data:/var/lib/telegram-bot-api:ro
     networks:
       - freeeman-network
     restart: unless-stopped
@@ -51,6 +69,10 @@ services:
     depends_on:
       freeman-backend:
         condition: service_healthy
+      telegram-bot-api:
+        condition: service_started
+    volumes:
+      - ./telegram-bot-api-data:/var/lib/telegram-bot-api:ro
     networks:
       - freeeman-network
     restart: unless-stopped
@@ -90,6 +112,7 @@ services:
       - freeeman-network
     restart: "no"
 
+    
 networks:
   freeeman-network:
     driver: bridge

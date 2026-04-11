@@ -16,13 +16,13 @@ router = Router(name="scale_handlers")
 @check_sub_channel_dec
 async def mashtab_handler(msg: types.Message):
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_document")
-    await msg.reply_document(
+    await msg.answer_document(
         document=FSInputFile(path=settings.files.scale_file_pdf),
     )
-    await msg.reply_document(
+    await msg.answer_document(
         document=FSInputFile(path=settings.files.scale_file_epub),
     )
-    await msg.reply(
+    await msg.answer(
         text=settings.message.text.get("scale"),
         reply_markup=scale_inline_keyboard(),
     )

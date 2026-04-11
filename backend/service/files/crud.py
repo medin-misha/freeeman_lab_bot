@@ -13,7 +13,7 @@ from service import CRUD
 from service.s3 import S3Client, build_download_filename
 
 
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+MAX_FILE_SIZE = 1000 * 1024 * 1024  # 1000 MB
 
 
 async def create_file(

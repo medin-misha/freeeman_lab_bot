@@ -2,6 +2,7 @@ import logging
 
 from aiogram import Router, types
 from aiogram.filters import CommandStart
+from aiogram.fsm.context import FSMContext
 
 from config import settings
 from core.buttons import start_inline_keyboard
@@ -12,7 +13,8 @@ user_api = UserAPI()
 
 
 @router.message(CommandStart())
-async def start_handler(msg: types.Message) -> None:
+async def start_handler(msg: types.Message, state: FSMContext) -> None:
+    await state.clear()
     await msg.answer(
         settings.message.text.get("start"),
         reply_markup=start_inline_keyboard(),

@@ -2,6 +2,8 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 
 from config import settings
 from handlers import main_router
@@ -10,7 +12,13 @@ from handlers.events.diagnostics import set_bot_instance as set_diagnostic_bot_i
 
 
 BOT_TOKEN = settings.token
-bot = Bot(token=BOT_TOKEN)
+session = AiohttpSession(
+    api=TelegramAPIServer.from_base(
+        settings.telegram_bot_api_url,
+        is_local=True,
+    )
+)
+bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
 

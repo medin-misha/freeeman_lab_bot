@@ -141,8 +141,7 @@ class S3Client:
 
     async def upload_file(
         self, file: bytes, object_name: str, folder: str = None, filename: str = None
-    ):
-    
+    ):    
         safe_folder = _transliterate_to_s3_safe(folder, allow_slash=True)
         safe_object_name = _transliterate_to_s3_safe(object_name)
         safe_filename = _slugify_filename(filename)

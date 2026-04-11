@@ -7,13 +7,15 @@ from .events.analysis import router as analysis_router
 from .events.diagnostics import router as diagnostics_router
 
 main_router = Router(name="main_router")
-main_router.include_router(errors_router)
 main_router.include_router(system_router)
 main_router.include_router(system_callback_router)
 main_router.include_router(scale_router)
 main_router.include_router(analysis_router)
 main_router.include_router(diagnostics_router)
 
+
+# должен быть последним
+main_router.include_router(errors_router)
 __all__ = [
     "main_router"
 ]

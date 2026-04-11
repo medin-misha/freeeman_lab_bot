@@ -10,7 +10,7 @@ import aiohttp
 from config import settings
 
 
-REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=35)
+REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=settings.api_timeout_seconds)
 
 
 @dataclass(slots=True)

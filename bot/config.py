@@ -21,9 +21,9 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore"
     )
-    
     token: str = Field(validation_alias="TOKEN")
     api_url: str = Field(validation_alias="API_URL")
+    telegram_bot_api_url: str = Field(validation_alias="TELEGRAM_BOT_API_URL")
     channel_id: str = Field(validation_alias="CHANNEL_ID")
     rmq_url: str = Field(validation_alias="RMQ_URL")
     diagnostic_response_queue: str = Field(

@@ -1,5 +1,10 @@
 from handlers import main_router
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
+
 import asyncio
 import logging
 from config import settings
@@ -9,12 +14,19 @@ from handlers.events.diagnostics import set_bot_instance as set_diagnostic_bot_i
 logger = logging.getLogger(__name__)
 
 BOT_TOKEN = settings.token
-bot = Bot(token=BOT_TOKEN)
+session = AiohttpSession(
+    api=TelegramAPIServer.from_base(
+        settings.telegram_bot_api_url,
+        is_local=True,
+    )
+)
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML), session=session)
 dp = Dispatcher()
 
 
+
 async def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     try:
         dp.include_router(main_router)
         set_diagnostic_bot_instance(bot)

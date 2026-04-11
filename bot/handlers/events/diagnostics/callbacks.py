@@ -7,7 +7,7 @@ from core.utils import ensure_user_registered
 
 router = Router(name="diagnostics_callbacks")
 
-@router.callback_query(F.data == settings.message.text.get("callback").get("send_file"),)
+# @router.callback_query(F.data == settings.message.text.get("callback").get("send_file"),)
 @ensure_user_registered
 async def send_file_callback(query: CallbackQuery, bot: Bot, state: FSMContext):
     await state.set_state(DiagnosticStates.waiting_for_audio)
