@@ -3,7 +3,7 @@ import mimetypes
 import re
 from pathlib import PurePosixPath
 
-from fastapi import Response, UploadFile
+from fastapi import HTTPException, Response, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +13,9 @@ from service import CRUD
 from service.s3 import S3Client, build_download_filename
 
 
+MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+
+
 async def create_file(
     session: AsyncSession,
     file: UploadFile,
@@ -20,6 +23,11 @@ async def create_file(
 ) -> FileReturn:
     s3_client = S3Client()
     raw_file = await file.read()
+    if len(raw_file) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File size exceeds the 100 MB limit.",
+        )
     object_name = hashlib.md5(raw_file).hexdigest()
     link = await s3_client.upload_file(
         file=raw_file,
