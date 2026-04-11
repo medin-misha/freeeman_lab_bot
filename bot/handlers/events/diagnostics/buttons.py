@@ -1,12 +1,13 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from config import settings
 
+
 def send_voice_inline_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Хочу скинуть голосовое",
+                    text="Хочу скинуть голосовое или документ",
                     callback_data=settings.message.text.get("callback").get("send_file"),
                 )
             ]
@@ -23,6 +24,19 @@ def confirmation_reply_keyboard() -> ReplyKeyboardMarkup:
         ],
         one_time_keyboard=True
     )
+
+
+def save_as_diagnostic_reply_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text="Да"),
+                KeyboardButton(text="Нет")
+            ]
+        ],
+        one_time_keyboard=True
+    )
+
 
 def diagnostic_success_reply_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(

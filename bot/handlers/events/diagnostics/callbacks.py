@@ -11,6 +11,5 @@ router = Router(name="diagnostics_callbacks")
 @ensure_user_registered
 async def send_file_callback(query: CallbackQuery, bot: Bot, state: FSMContext):
     await state.set_state(DiagnosticStates.waiting_for_audio)
-    await query.answer(text="Отправь голосовое сообщение")
-    await query.message.reply(text="Отправь голосовое сообщение")
-
+    await query.answer(text="Отправь голосовое сообщение или документ")
+    await query.message.reply(text="Отправь голосовое сообщение или документ")

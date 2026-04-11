@@ -73,7 +73,7 @@ async def handle_diagnostic_request(message: object) -> None:
         )
         reply_markup = send_result_inline_keyboard(diagnostic_id, user_id)
         await _broadcast_message(notification_text, reply_markup)
-        await _broadcast_voice(downloaded_file)
+        await _broadcast_document(downloaded_file)
     except Exception:
         logger.exception(
             "Failed to process diagnostic event for diagnostic_id=%s user_id=%s file_id=%s",
@@ -97,18 +97,18 @@ async def _broadcast_message(
             logger.exception("Failed to send Telegram message to chat_id=%s", chat_id)
 
 
-async def _broadcast_voice(downloaded_file: DownloadedFile) -> None:
+async def _broadcast_document(downloaded_file: DownloadedFile) -> None:
     if _bot is None:
         return
 
     for chat_id in settings.chat_ids_list:
         try:
-            await _bot.send_voice(
+            await _bot.send_document(
                 chat_id=chat_id,
-                voice=BufferedInputFile(
+                document=BufferedInputFile(
                     downloaded_file.content,
                     filename=downloaded_file.filename,
                 ),
             )
         except Exception:
-            logger.exception("Failed to send Telegram voice to chat_id=%s", chat_id)
+            logger.exception("Failed to send Telegram document to chat_id=%s", chat_id)

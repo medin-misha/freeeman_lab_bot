@@ -8,7 +8,7 @@ from typing import Any
 
 import aiohttp
 from aiogram import Bot
-from aiogram.types import Voice, User
+from aiogram.types import Document, User, Voice
 
 from config import settings
 
@@ -158,18 +158,36 @@ async def get_or_create_user(chat_id: str, from_user: User, user_api: UserAPI) -
 
 
 class DiagnosticsAPI(API):
-    async def voice_to_bytes(self, voice: Voice, bot: Bot):
-        if voice is None:
-            raise ValueError("Voice is None")
-        tg_file = await bot.get_file(voice.file_id)
+    async def download_telegram_file(
+        self,
+        telegram_file: Voice | Document,
+        bot: Bot,
+    ) -> DownloadedFile:
+        if telegram_file is None:
+            raise ValueError("Telegram file is None")
+
+        tg_file = await bot.get_file(telegram_file.file_id)
         buffer = io.BytesIO()
         await bot.download_file(tg_file.file_path, destination=buffer)
         buffer.seek(0)
-        return buffer.getvalue()
+        content_type = telegram_file.mime_type or "application/octet-stream"
+
+        if isinstance(telegram_file, Voice):
+            filename = "voice_message.ogg"
+            content_type = telegram_file.mime_type or "audio/ogg"
+        else:
+            extension = mimetypes.guess_extension(content_type.partition(";")[0].strip()) or ".bin"
+            filename = telegram_file.file_name or f"document{extension}"
+
+        return DownloadedFile(
+            content=buffer.getvalue(),
+            content_type=content_type,
+            filename=filename,
+        )
 
     async def create_diagnostic(
         self,
-        voice: Voice,
+        telegram_file: Voice | Document,
         bot: Bot,
         chat_id: str,
         from_user: User,
@@ -177,8 +195,12 @@ class DiagnosticsAPI(API):
         user_api = UserAPI()
         user = await get_or_create_user(chat_id=chat_id, from_user=from_user, user_api=user_api)
         file_api = FileAPI()
-        file_bytes: bytes = await self.voice_to_bytes(voice, bot)
-        file = await file_api.upload_file(file_bytes, "voice_message.ogg", "audio/ogg")
+        uploaded_file = await self.download_telegram_file(telegram_file, bot)
+        file = await file_api.upload_file(
+            uploaded_file.content,
+            uploaded_file.filename,
+            uploaded_file.content_type,
+        )
         payload = {
             "file_id": file["id"],
             "user_id": user["id"],
