@@ -16,6 +16,7 @@ class DiagnosticsBase(BaseModel):
     status: DiagnosticStatusEnum | None = None
     file_id: int | None = None
     result_file_id: int | None = None
+    description: str | None = None
     passed_at: datetime | None = None
     user_id: int | None = None
 
@@ -24,6 +25,7 @@ class DiagnosticsCreate(BaseModel):
     status: DiagnosticStatusEnum = DiagnosticStatusEnum.PENDING
     file_id: int
     result_file_id: int | None = None
+    description: str | None = None
     passed_at: datetime | None = None
     user_id: int
 

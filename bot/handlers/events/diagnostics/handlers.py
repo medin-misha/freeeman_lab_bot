@@ -24,6 +24,7 @@ async def _send_diagnostic(
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="typing")
     await DiagnosticsAPI().create_diagnostic(
         telegram_file=data["diagnostic_file"],
+        description=data.get("description"),
         chat_id=str(msg.chat.id),
         bot=msg.bot,
         from_user=msg.from_user,
@@ -55,11 +56,43 @@ async def voice_handler(msg: types.Message, state: FSMContext):
     diagnostic_file = msg.voice or msg.document or msg.audio
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="typing")
     await msg.answer(
+        text=settings.message.text.get(
+            "diagnostic_description_prompt",
+            "Пришли одним сообщением:\n"
+            "ФИО, Возраст, Город\n\n"
+            "И по желанию:\n"
+            "1. Какой вопрос задел сильнее всего?\n"
+            "2. Где было самое большое напряжение?\n"
+            "3. Где поднялись самые сильные эмоции?\n"
+            "4. Где пришел важный инсайт?\n"
+            "5. Какой шаг на 72 часа ты выбрал?",
+        ),
+    )
+    await state.update_data({"diagnostic_file": diagnostic_file})
+    await state.set_state(DiagnosticStates.waiting_for_description)
+
+
+@router.message(DiagnosticStates.waiting_for_description, F.text)
+@ensure_user_registered
+async def description_handler(msg: types.Message, state: FSMContext):
+    await msg.bot.send_chat_action(chat_id=msg.chat.id, action="typing")
+    await state.update_data({"description": msg.text})
+    await msg.answer(
         text="Подтвердить отправку, или попробовать ещё раз?",
         reply_markup=confirmation_reply_keyboard(),
     )
-    await state.update_data({"diagnostic_file": diagnostic_file})
     await state.set_state(DiagnosticStates.confirmation)
+
+
+@router.message(DiagnosticStates.waiting_for_description)
+@ensure_user_registered
+async def description_invalid_handler(msg: types.Message):
+    await msg.answer(
+        text=settings.message.text.get(
+            "diagnostic_description_invalid",
+            "Пришли ответ одним текстовым сообщением.",
+        )
+    )
 
 
 @router.message(DiagnosticStates.confirmation, F.text.lower() == "отправить")
@@ -72,6 +105,7 @@ async def confirmation_handler(msg: types.Message, state: FSMContext):
 @ensure_user_registered
 async def confirmation_retry_handler(msg: types.Message, state: FSMContext):
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="typing")
+    await state.update_data({"diagnostic_file": None, "description": None})
     await msg.answer(text="Жду твоё голосовое сообщение или документ")
     await state.set_state(DiagnosticStates.waiting_for_audio)
 

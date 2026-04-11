@@ -191,6 +191,7 @@ class DiagnosticsAPI(API):
         bot: Bot,
         chat_id: str,
         from_user: User,
+        description: str | None = None,
     ) -> dict[str, Any]:
         user_api = UserAPI()
         user = await get_or_create_user(chat_id=chat_id, from_user=from_user, user_api=user_api)
@@ -204,6 +205,7 @@ class DiagnosticsAPI(API):
         payload = {
             "file_id": file["id"],
             "user_id": user["id"],
+            "description": description,
         }
         return await self.post("/diagnostics", payload)
 

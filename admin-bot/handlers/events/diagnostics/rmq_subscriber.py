@@ -10,6 +10,7 @@ from core.utils import (
     FileAPI,
     UserAPI,
     build_display_name,
+    extract_description,
     extract_diagnostic_id,
     extract_file_id,
     extract_user_id,
@@ -37,6 +38,7 @@ async def handle_diagnostic_request(message: object) -> None:
     diagnostic_id = extract_diagnostic_id(message)
     file_id = extract_file_id(message)
     user_id = extract_user_id(message)
+    description = extract_description(message)
 
     if diagnostic_id is None:
         logger.warning("Diagnostic event does not contain diagnostic id: %r", message)
@@ -66,10 +68,11 @@ async def handle_diagnostic_request(message: object) -> None:
         downloaded_file = await file_api.download_file(file_id)
         notification_text = settings.message.text.get("notifications", {}).get(
             "diagnostic_request",
-            "Пользователь ({display_name}) хочет пройти диагностику",
+            "Пользователь ({display_name}) хочет пройти диагностику\n\nОписание:\n{description}",
         ).format(
             display_name=build_display_name(user.username, user_id),
             user_id=user_id,
+            description=description or "Описание не указано.",
         )
         reply_markup = send_result_inline_keyboard(diagnostic_id, user_id)
         await _broadcast_message(notification_text, reply_markup)

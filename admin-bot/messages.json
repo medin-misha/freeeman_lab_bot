@@ -1,7 +1,7 @@
 {
     "start": "Admin bot active",
     "notifications": {
-        "diagnostic_request": "Пользователь ({display_name}) хочет пройти диагностику"
+        "diagnostic_request": "Пользователь ({display_name}) хочет пройти диагностику\n\nОписание:\n{description}"
     },
     "diagnostics": {
         "wait_for_result_file": "Жду файл диагностики для этого пользователя.",

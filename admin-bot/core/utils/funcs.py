@@ -72,6 +72,15 @@ def extract_user_id(obj: object) -> int | None:
     return _coerce_int(_extract_value(obj, "user_id"))
 
 
+def extract_description(obj: object) -> str | None:
+    value = _extract_value(obj, "description")
+    if isinstance(value, str):
+        description = value.strip()
+        return description or None
+
+    return None
+
+
 def build_display_name(username: str | None, user_id: int) -> str:
     if isinstance(username, str) and username.strip():
         return username.strip()
