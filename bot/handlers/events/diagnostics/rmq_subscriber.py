@@ -55,6 +55,22 @@ async def handle_diagnostic_response(message: object) -> None:
             file_id,
             chat_id,
         )
+        try:
+            await _bot.send_message(
+                chat_id=chat_id,
+                text=settings.message.text.get("errors", {}).get(
+                    "server_error",
+                    (
+                        "На стороне сервера произошла ошибка. "
+                        "Пожалуйста, обратитесь в поддержку @it_was_I_misha."
+                    ),
+                ),
+            )
+        except Exception:
+            logger.exception(
+                "Failed to notify chat_id=%s about delivery problem",
+                chat_id,
+            )
 
 
 def _extract_chat_id(message: object) -> str | None:

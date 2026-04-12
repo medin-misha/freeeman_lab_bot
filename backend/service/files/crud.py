@@ -26,7 +26,7 @@ async def create_file(
     if len(raw_file) > MAX_FILE_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File size exceeds the 100 MB limit.",
+            detail="File size exceeds the 1000 MB limit.",
         )
     object_name = hashlib.md5(raw_file).hexdigest()
     link = await s3_client.upload_file(

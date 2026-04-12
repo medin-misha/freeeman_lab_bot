@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import io
+import json
 import mimetypes
 import re
 from dataclasses import dataclass
@@ -8,9 +10,11 @@ from typing import Any
 
 import aiohttp
 from aiogram import Bot
-from aiogram.types import Document, User, Voice
+from aiogram.types import Audio, Document, User, Voice
 
 from config import settings
+
+REQUEST_TIMEOUT_SECONDS = 60
 
 
 @dataclass(slots=True)
@@ -23,46 +27,200 @@ class DownloadedFile:
 class API:
     def __init__(self, url: str | None = None) -> None:
         self.url = (url or settings.api_url).rstrip("/")
+        self.timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SECONDS)
 
     def build_url(self, path: str) -> str:
         return f"{self.url}/{path.lstrip('/')}"
 
-    async def post(self, path: str, data: dict[str, Any]) -> dict[str, Any]:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.build_url(path), json=data) as response:
-                response.raise_for_status()
-                return await response.json()
+    async def _request_json(
+        self,
+        method: str,
+        path: str,
+        *,
+        json_data: dict[str, Any] | None = None,
+        form: aiohttp.FormData | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> Any:
+        try:
+            async with aiohttp.ClientSession(timeout=self.timeout) as session:
+                async with session.request(
+                    method=method,
+                    url=self.build_url(path),
+                    json=json_data,
+                    data=form,
+                    params=params,
+                ) as response:
+                    payload = await self._read_response_payload(response)
+                    if response.status >= 400:
+                        detail = self._extract_error_detail(payload)
+                        try:
+                            response.raise_for_status()
+                        except aiohttp.ClientResponseError as err:
+                            self._raise_api_error(
+                                method=method,
+                                path=path,
+                                status_code=err.status,
+                                detail=detail,
+                            )
 
-    async def get(self, path: str) -> dict[str, Any]:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.build_url(path)) as response:
-                response.raise_for_status()
-                return await response.json()
+                    return payload
+        except aiohttp.ClientResponseError as err:
+            self._raise_api_error(
+                method=method,
+                path=path,
+                status_code=err.status,
+                detail=str(err),
+            )
+        except (
+            aiohttp.ClientConnectionError,
+            aiohttp.ClientPayloadError,
+            asyncio.TimeoutError,
+        ) as err:
+            raise self._build_support_required_error(
+                path=path,
+                detail=str(err),
+            ) from err
+
+    async def post(self, path: str, data: dict[str, Any]) -> Any:
+        return await self._request_json("POST", path, json_data=data)
+
+    async def get(self, path: str) -> Any:
+        return await self._request_json("GET", path)
 
     async def post_multipart(
         self,
         path: str,
         form: aiohttp.FormData,
         params: dict[str, Any] | None = None,
-    ):
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                self.build_url(path),
-                data=form,
-                params=params,
-            ) as response:
-                response.raise_for_status()
-                return await response.json()
+    ) -> Any:
+        return await self._request_json(
+            "POST",
+            path,
+            form=form,
+            params=params,
+        )
+
+    async def _read_response_payload(self, response: aiohttp.ClientResponse) -> Any:
+        try:
+            return await response.json(content_type=None)
+        except (aiohttp.ContentTypeError, json.JSONDecodeError):
+            try:
+                text = (await response.text()).strip()
+            except UnicodeDecodeError:
+                return None
+            return text or None
+
+    def _extract_error_detail(self, payload: Any) -> str | None:
+        if isinstance(payload, dict):
+            return self._normalize_error_detail(payload.get("detail"))
+
+        return self._normalize_error_detail(payload)
+
+    def _normalize_error_detail(self, detail: Any) -> str | None:
+        if detail is None:
+            return None
+
+        if isinstance(detail, str):
+            normalized = detail.strip()
+            return normalized or None
+
+        if isinstance(detail, list):
+            parts: list[str] = []
+            for item in detail:
+                if isinstance(item, dict):
+                    message = str(item.get("msg", "")).strip()
+                    loc = item.get("loc")
+                    if isinstance(loc, list):
+                        location = ".".join(str(part) for part in loc)
+                    else:
+                        location = str(loc).strip() if loc is not None else ""
+                    if location and message:
+                        parts.append(f"{location}: {message}")
+                    elif message:
+                        parts.append(message)
+                elif item is not None:
+                    parts.append(str(item).strip())
+
+            normalized = "; ".join(part for part in parts if part)
+            return normalized or None
+
+        return str(detail).strip() or None
+
+    def _raise_api_error(
+        self,
+        *,
+        method: str,
+        path: str,
+        status_code: int,
+        detail: str | None,
+    ) -> None:
+        normalized_path = path.split("?", 1)[0]
+        FileTooLargeError, InvalidDiagnosticFileError, SupportRequiredError = (
+            self._load_error_types()
+        )
+
+        if normalized_path == "/files" and method == "POST":
+            if status_code == 413:
+                raise FileTooLargeError(detail=detail)
+            if status_code in {400, 422}:
+                raise InvalidDiagnosticFileError(detail=detail)
+
+        if status_code in {500, 502, 503, 504}:
+            raise SupportRequiredError(
+                endpoint=path,
+                status_code=status_code,
+                detail=detail,
+            )
+
+        if (
+            normalized_path in {"/users", "/diagnostics"}
+            and method == "POST"
+            and status_code in {400, 404, 409, 422}
+        ):
+            raise SupportRequiredError(
+                endpoint=path,
+                status_code=status_code,
+                detail=detail,
+            )
+
+        raise SupportRequiredError(
+            endpoint=path,
+            status_code=status_code,
+            detail=detail,
+        )
+
+    def _build_support_required_error(
+        self,
+        *,
+        path: str,
+        detail: str | None,
+        status_code: int | None = None,
+    ) -> Exception:
+        _, _, SupportRequiredError = self._load_error_types()
+        return SupportRequiredError(
+            endpoint=path,
+            status_code=status_code,
+            detail=detail,
+        )
+
+    def _load_error_types(self):
+        from handlers.errors.exceptions import (
+            FileTooLargeError,
+            InvalidDiagnosticFileError,
+            SupportRequiredError,
+        )
+
+        return FileTooLargeError, InvalidDiagnosticFileError, SupportRequiredError
 
 
 class UserAPI(API):
     async def add_user(
         self,
-        username: str,
-        email: str,
-        phone: str,
-        first_name: str,
-        last_name: str,
+        username: str | None,
+        email: str | None,
+        phone: str | None,
+        first_name: str | None,
+        last_name: str | None,
         chat_id: str,
     ) -> dict[str, Any]:
         payload = {
@@ -75,7 +233,7 @@ class UserAPI(API):
         }
         return await self.post("/users", payload)
 
-    async def get_user_bi_chat_id(self, chat_id: str) -> dict[str, Any]:
+    async def get_user_bi_chat_id(self, chat_id: str) -> list[dict[str, Any]]:
         return await self.get(f"/users?page=1&limit=10&search={chat_id}&field=chat_id")
 
 
@@ -101,17 +259,41 @@ class FileAPI(API):
         )
 
     async def download_file(self, file_id: int) -> DownloadedFile:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.build_url(f"/files/{file_id}")) as response:
-                response.raise_for_status()
-                content = await response.read()
-                content_type = response.headers.get(
-                    "Content-Type",
-                    "application/octet-stream",
-                )
-                filename = self._extract_filename(
-                    response.headers.get("Content-Disposition")
-                )
+        path = f"/files/{file_id}"
+
+        try:
+            async with aiohttp.ClientSession(timeout=self.timeout) as session:
+                async with session.get(self.build_url(path)) as response:
+                    if response.status >= 400:
+                        payload = await self._read_response_payload(response)
+                        detail = self._extract_error_detail(payload)
+                        try:
+                            response.raise_for_status()
+                        except aiohttp.ClientResponseError as err:
+                            self._raise_api_error(
+                                method="GET",
+                                path=path,
+                                status_code=err.status,
+                                detail=detail,
+                            )
+
+                    content = await response.read()
+                    content_type = response.headers.get(
+                        "Content-Type",
+                        "application/octet-stream",
+                    )
+                    filename = self._extract_filename(
+                        response.headers.get("Content-Disposition")
+                    )
+        except (
+            aiohttp.ClientConnectionError,
+            aiohttp.ClientPayloadError,
+            asyncio.TimeoutError,
+        ) as err:
+            raise self._build_support_required_error(
+                path=path,
+                detail=str(err),
+            ) from err
 
         return DownloadedFile(
             content=content,
@@ -136,7 +318,11 @@ class FileAPI(API):
         return filename or None
 
 
-async def get_or_create_user(chat_id: str, from_user: User, user_api: UserAPI) -> dict[str, Any]:
+async def get_or_create_user(
+    chat_id: str,
+    from_user: User,
+    user_api: UserAPI,
+) -> dict[str, Any]:
     """
     Возвращает пользователя из БД по chat_id.
     Если пользователь не найден — регистрирует его и возвращает созданного.
@@ -154,13 +340,19 @@ async def get_or_create_user(chat_id: str, from_user: User, user_api: UserAPI) -
         chat_id=str(from_user.id),
     )
     users = await user_api.get_user_bi_chat_id(chat_id)
+    if not users:
+        raise user_api._build_support_required_error(
+            path="/users",
+            status_code=500,
+            detail="User was not returned after creation.",
+        )
     return users[0]
 
 
 class DiagnosticsAPI(API):
     async def download_telegram_file(
         self,
-        telegram_file: Voice | Document,
+        telegram_file: Voice | Document | Audio,
         bot: Bot,
     ) -> DownloadedFile:
         if telegram_file is None:
@@ -187,7 +379,7 @@ class DiagnosticsAPI(API):
 
     async def create_diagnostic(
         self,
-        telegram_file: Voice | Document,
+        telegram_file: Voice | Document | Audio,
         bot: Bot,
         chat_id: str,
         from_user: User,

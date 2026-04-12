@@ -1,12 +1,10 @@
-import logging
-
 from aiogram import Router, types
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
 from config import settings
 from core.buttons import start_inline_keyboard
-from core.utils import UserAPI
+from core.utils import UserAPI, get_or_create_user
 
 router = Router(name="system")
 user_api = UserAPI()
@@ -22,14 +20,8 @@ async def start_handler(msg: types.Message, state: FSMContext) -> None:
     user = msg.from_user
 
     if user is not None:
-        try:
-            await user_api.add_user(
-                username=user.username,
-                email=None,
-                phone=None,
-                first_name=user.first_name,
-                last_name=user.last_name,
-                chat_id=str(user.id),
-            )
-        except Exception:
-            logging.exception("Failed to register user %s", user.id)
+        await get_or_create_user(
+            chat_id=str(user.id),
+            from_user=user,
+            user_api=user_api,
+        )
