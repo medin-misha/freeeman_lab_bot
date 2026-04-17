@@ -1,4 +1,5 @@
 apiVersion: 1
 # Telegram contact point настраивается вручную через UI:
-# Alerting → Contact points → Add contact point → Type: Telegram
-# После создания обновить notification_policies.yml (receiver: Telegram)
+# Alerting -> Contact points -> Add contact point -> Type: Telegram
+# После создания укажите в notification_policies.yml имя созданного contact point
+# вместо безопасного fallback receiver `grafana-default`.
