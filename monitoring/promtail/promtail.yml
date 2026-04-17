@@ -13,12 +13,11 @@ scrape_configs:
     docker_sd_configs:
       - host: unix:///var/run/docker.sock
         refresh_interval: 5s
+        filters:
+          - name: label
+            values:
+              - com.docker.compose.project=freeeman_lab_bot
     relabel_configs:
-      - source_labels: [__meta_docker_container_label_com_docker_compose_project]
-        regex: freeeman_lab_bot
-        action: keep
-      - target_label: job
-        replacement: docker
       - source_labels: [__meta_docker_container_name]
         regex: /?(.*)
         target_label: container
@@ -32,3 +31,5 @@ scrape_configs:
         action: drop
     pipeline_stages:
       - docker: {}
+      - static_labels:
+          job: docker

@@ -6,12 +6,12 @@ Stop `promtail` from sending unlabeled log streams to Loki and remove noise from
 
 ## Chosen Approach
 
-Restrict `promtail` discovery to containers from the `freeeman_lab_bot` compose project and add a guaranteed static label.
+Restrict `promtail` discovery to containers from the `freeeman_lab_bot` compose project at the Docker SD layer and add a guaranteed static label in the pipeline.
 
 ## Changes
 
-- Keep only containers with `com.docker.compose.project=freeeman_lab_bot`.
-- Add `job=docker` as a guaranteed label for every discovered stream.
+- Restrict Docker service discovery with `docker_sd_configs.filters` to containers with `com.docker.compose.project=freeeman_lab_bot`.
+- Add `job=docker` with `static_labels` so every processed stream has at least one label even if relabeling behaves unexpectedly.
 - Relax the container name regex from `/(.*)` to `/?(.*)` so the `container` label is preserved consistently.
 - Keep dropping monitoring services themselves to avoid ingest noise.
 
