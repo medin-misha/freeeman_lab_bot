@@ -12,6 +12,14 @@
 - `freeman-minio` — S3-совместимое хранилище файлов
 - `freeman-minio-init` — инициализация bucket в MinIO
 
+И стек мониторинга:
+
+- `loki` — агрегация и хранение логов (retention 3 дня)
+- `promtail` — сбор логов из всех Docker-контейнеров
+- `prometheus` — сбор метрик (cAdvisor + backend, retention 3 дня)
+- `cadvisor` — метрики Docker-контейнеров (CPU, RAM, рестарты)
+- `grafana` — дашборды, визуализация логов и метрик, алерты в Telegram
+
 ## Как это работает
 
 Основной сценарий такой:
@@ -54,6 +62,8 @@
 - `backend/.env.example`
 - `bot/.env.example`
 - `admin-bot/.env.example`
+
+Для мониторинга добавьте переменные в `.env` в корне репозитория (см. раздел [Мониторинг](#мониторинг)).
 
 ### 2. Убедитесь, что PostgreSQL и RabbitMQ доступны контейнерам
 
@@ -315,6 +325,67 @@ CHAT_IDS=123456789,-1001234567890
 6. `backend` публикует сообщение в `RMQ_DIAGNOSTIC_RESPONSE_QUEUE`.
 7. Пользовательский `bot` отправляет результат пользователю.
 
+## Мониторинг
+
+### Стек
+
+| Сервис | Порт | Назначение |
+| --- | --- | --- |
+| Grafana | `3000` | Дашборды, логи, алерты |
+| Prometheus | `9090` | Хранение метрик |
+| Loki | `3100` | Хранение логов |
+
+Grafana открывается на `http://localhost:3000`.
+Логин по умолчанию: `admin` / значение `GRAFANA_ADMIN_PASSWORD` из `.env`.
+
+### Необходимые переменные окружения
+
+Добавьте в `.env` в корне репозитория:
+
+```env
+# Grafana
+GRAFANA_ADMIN_PASSWORD=ваш_пароль
+
+# Telegram-бот для алертов (отдельный от бота приложения)
+TELEGRAM_BOT_TOKEN=123456:ABC-токен-бота
+TELEGRAM_CHAT_ID=-100xxxxxxxxx
+```
+
+`TELEGRAM_CHAT_ID` — числовой id чата или группы, куда Grafana будет слать уведомления.
+Чтобы получить chat id группы, добавьте в неё бота и отправьте сообщение, затем проверьте `https://api.telegram.org/bot<TOKEN>/getUpdates`.
+
+### Дашборд Freeman Services
+
+Загружается автоматически при старте Grafana. Содержит:
+
+- **Service Status** — статус каждого контейнера (Running / Issues / Stopped)
+- **Backend HTTP Metrics** — request rate по статусам, 5xx ошибки по endpoint'ам, latency p50/p95/p99
+- **Container Resources** — CPU % и RAM для всех контейнеров
+- **Logs** — логи backend, bot и admin-bot в реальном времени
+
+### Алерты
+
+Настроены два правила:
+
+| Алерт | Условие | Куда |
+| --- | --- | --- |
+| Backend 5xx Errors | `rate(http_requests_total{status_code=~"5.."}[5m]) > 0` в течение 1 мин | Telegram |
+| Container Down | контейнер не виден cAdvisor'у > 60 с | Telegram |
+
+### Логи мониторинга
+
+```bash
+docker compose logs -f grafana
+docker compose logs -f loki
+docker compose logs -f promtail
+docker compose logs -f prometheus
+```
+
+### Retention
+
+- Логи (Loki): **3 дня**
+- Метрики (Prometheus): **3 дня**
+
 ## Частые проблемы
 
 ### Backend не стартует
@@ -352,6 +423,8 @@ docker compose ps
 docker compose logs -f freeman-backend
 docker compose logs -f freeman-bot
 docker compose logs -f freeman-admin-bot
+docker compose logs -f grafana
+docker compose logs -f prometheus
 docker compose restart freeman-backend
 docker compose restart freeman-bot
 docker compose restart freeman-admin-bot

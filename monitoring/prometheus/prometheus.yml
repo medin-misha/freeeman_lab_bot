@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: [localhost:9090]
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: [cadvisor:8080]
+    metric_relabel_configs:
+      # Keep only container-level metrics, drop noisy internal ones
+      - source_labels: [__name__]
+        regex: container_(cpu_usage_seconds_total|memory_working_set_bytes|last_seen|start_time_seconds|network_receive_bytes_total|network_transmit_bytes_total)
+        action: keep
+
+  - job_name: backend
+    static_configs:
+      - targets: [freeman-backend:8000]
+    metrics_path: /metrics

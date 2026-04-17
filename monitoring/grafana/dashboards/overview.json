@@ -1,0 +1,298 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "id": null,
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["freeman"],
+  "title": "Freeman Services",
+  "uid": "freeman-overview",
+  "version": 1,
+  "time": { "from": "now-3h", "to": "now" },
+  "panels": [
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "id": 1, "title": "Service Status", "type": "row" },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "none",
+          "noValue": "Stopped",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 30 }] },
+          "mappings": [
+            { "type": "range", "options": { "from": 0, "to": 29, "result": { "text": "Running", "color": "green", "index": 0 } } },
+            { "type": "range", "options": { "from": 30, "to": 1000000, "result": { "text": "Issues", "color": "orange", "index": 1 } } },
+            { "type": "special", "options": { "match": "null", "result": { "text": "Stopped", "color": "red", "index": 2 } } }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 3, "w": 5, "x": 0, "y": 1 },
+      "id": 2,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "name" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(time() - container_last_seen{container_label_com_docker_compose_service=\"freeman-backend\",name!=\"\"})", "instant": true, "refId": "A" }],
+      "title": "Backend",
+      "type": "stat"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "none",
+          "noValue": "Stopped",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 30 }] },
+          "mappings": [
+            { "type": "range", "options": { "from": 0, "to": 29, "result": { "text": "Running", "color": "green", "index": 0 } } },
+            { "type": "range", "options": { "from": 30, "to": 1000000, "result": { "text": "Issues", "color": "orange", "index": 1 } } },
+            { "type": "special", "options": { "match": "null", "result": { "text": "Stopped", "color": "red", "index": 2 } } }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 3, "w": 5, "x": 5, "y": 1 },
+      "id": 3,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "name" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(time() - container_last_seen{container_label_com_docker_compose_service=\"freeman-bot\",name!=\"\"})", "instant": true, "refId": "A" }],
+      "title": "Bot",
+      "type": "stat"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "none",
+          "noValue": "Stopped",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 30 }] },
+          "mappings": [
+            { "type": "range", "options": { "from": 0, "to": 29, "result": { "text": "Running", "color": "green", "index": 0 } } },
+            { "type": "range", "options": { "from": 30, "to": 1000000, "result": { "text": "Issues", "color": "orange", "index": 1 } } },
+            { "type": "special", "options": { "match": "null", "result": { "text": "Stopped", "color": "red", "index": 2 } } }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 3, "w": 5, "x": 10, "y": 1 },
+      "id": 4,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "name" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(time() - container_last_seen{container_label_com_docker_compose_service=\"freeman-admin-bot\",name!=\"\"})", "instant": true, "refId": "A" }],
+      "title": "Admin Bot",
+      "type": "stat"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "none",
+          "noValue": "Stopped",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 30 }] },
+          "mappings": [
+            { "type": "range", "options": { "from": 0, "to": 29, "result": { "text": "Running", "color": "green", "index": 0 } } },
+            { "type": "range", "options": { "from": 30, "to": 1000000, "result": { "text": "Issues", "color": "orange", "index": 1 } } },
+            { "type": "special", "options": { "match": "null", "result": { "text": "Stopped", "color": "red", "index": 2 } } }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 3, "w": 5, "x": 15, "y": 1 },
+      "id": 5,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "name" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(time() - container_last_seen{container_label_com_docker_compose_service=\"telegram-bot-api\",name!=\"\"})", "instant": true, "refId": "A" }],
+      "title": "Telegram Bot API",
+      "type": "stat"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "none",
+          "noValue": "Stopped",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 30 }] },
+          "mappings": [
+            { "type": "range", "options": { "from": 0, "to": 29, "result": { "text": "Running", "color": "green", "index": 0 } } },
+            { "type": "range", "options": { "from": 30, "to": 1000000, "result": { "text": "Issues", "color": "orange", "index": 1 } } },
+            { "type": "special", "options": { "match": "null", "result": { "text": "Stopped", "color": "red", "index": 2 } } }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 3, "w": 4, "x": 20, "y": 1 },
+      "id": 6,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "name" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "max(time() - container_last_seen{container_label_com_docker_compose_service=\"freeman-minio\",name!=\"\"})", "instant": true, "refId": "A" }],
+      "title": "MinIO",
+      "type": "stat"
+    },
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 }, "id": 7, "title": "Backend HTTP Metrics", "type": "row" },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2 }, "unit": "reqps" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "2xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "id": 8,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_requests_total{status_code=~\"2..\"}[2m]))", "legendFormat": "2xx", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_requests_total{status_code=~\"4..\"}[2m]))", "legendFormat": "4xx", "refId": "B" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[2m]))", "legendFormat": "5xx", "refId": "C" }
+      ],
+      "title": "Request Rate by Status Code",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "red", "mode": "fixed" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15 },
+          "unit": "reqps",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.001 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "id": 9,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single" } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (handler) (rate(http_requests_total{status_code=~\"5..\"}[5m]))", "legendFormat": "{{ handler }}", "refId": "A" }
+      ],
+      "title": "5xx Errors by Endpoint",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 1 }, "unit": "s" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "id": 10,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.50, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))", "legendFormat": "p50", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))", "legendFormat": "p95", "refId": "B" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))", "legendFormat": "p99", "refId": "C" }
+      ],
+      "title": "Request Latency (p50 / p95 / p99)",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 1 }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "id": 11,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_requests_total[5m]))", "legendFormat": "Total req/s", "refId": "A" }
+      ],
+      "title": "Total Request Rate",
+      "type": "timeseries"
+    },
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 }, "id": 12, "title": "Container Resources", "type": "row" },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 1 }, "unit": "percent", "min": 0 },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "id": 13,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=~\"freeman-backend|freeman-bot|freeman-admin-bot|telegram-bot-api|freeman-minio\",name!=\"\"}[2m]) * 100",
+          "legendFormat": "{{ container_label_com_docker_compose_service }}",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Usage %",
+      "type": "timeseries"
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 1 }, "unit": "bytes", "min": 0 },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "id": 14,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "container_memory_working_set_bytes{container_label_com_docker_compose_service=~\"freeman-backend|freeman-bot|freeman-admin-bot|telegram-bot-api|freeman-minio\",name!=\"\"}",
+          "legendFormat": "{{ container_label_com_docker_compose_service }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory Usage",
+      "type": "timeseries"
+    },
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 }, "id": 15, "title": "Logs", "type": "row" },
+
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 31 },
+      "id": 16,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": false },
+      "targets": [
+        { "datasource": { "type": "loki", "uid": "loki" }, "expr": "{service=\"freeman-backend\"}", "refId": "A" }
+      ],
+      "title": "Backend Logs",
+      "type": "logs"
+    },
+
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 39 },
+      "id": 17,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": false },
+      "targets": [
+        { "datasource": { "type": "loki", "uid": "loki" }, "expr": "{service=\"freeman-bot\"}", "refId": "A" }
+      ],
+      "title": "Bot Logs",
+      "type": "logs"
+    },
+
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 39 },
+      "id": 18,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": false },
+      "targets": [
+        { "datasource": { "type": "loki", "uid": "loki" }, "expr": "{service=\"freeman-admin-bot\"}", "refId": "A" }
+      ],
+      "title": "Admin Bot Logs",
+      "type": "logs"
+    }
+
+  ]
+}

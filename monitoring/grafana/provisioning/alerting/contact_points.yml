@@ -1,0 +1,4 @@
+apiVersion: 1
+# Telegram contact point настраивается вручную через UI:
+# Alerting → Contact points → Add contact point → Type: Telegram
+# После создания обновить notification_policies.yml (receiver: Telegram)
