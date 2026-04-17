@@ -89,7 +89,10 @@ uv run alembic revision -m "description"
 
 Основные endpoints:
 
-- `GET /health` — healthcheck
+- `GET /live` — liveness probe, проверяет только что backend отвечает
+- `GET /ready` — readiness probe, проверяет PostgreSQL, RabbitMQ и S3 / MinIO
+- `GET /health` — подробный healthcheck backend, PostgreSQL, RabbitMQ и S3 / MinIO
+- `GET /metrics` — Prometheus-метрики (HTTP request rate, latency, статусы)
 - `POST /users` — создать пользователя
 - `GET /users` — получить пользователей
 - `POST /files/` — загрузить файл
@@ -111,14 +114,36 @@ uv run alembic revision -m "description"
 ## Проверка работоспособности
 
 ```bash
+curl http://localhost:8000/live
+curl http://localhost:8000/ready
 curl http://localhost:8000/health
 ```
 
-Ожидаемый ответ:
+`/live` при живом процессе backend отвечает так:
 
 ```json
-{"status":"ok"}
+{"status":"ok","service":"backend"}
 ```
+
+`/ready` возвращает `200 OK` и `{"status":"ok"}`, если backend готов принимать трафик.
+
+Если PostgreSQL, RabbitMQ или S3 / MinIO недоступны, `/ready` и `/health` вернут `503 Service Unavailable`.
+
+Пример ответа `/health` при доступных зависимостях:
+
+```json
+{
+  "status": "ok",
+  "checks": {
+    "backend": {"status": "ok"},
+    "database": {"status": "ok"},
+    "rmq": {"status": "ok"},
+    "storage": {"status": "ok"}
+  }
+}
+```
+
+Если одна из зависимостей недоступна, `/health` вернёт `status: "fail"` и короткое поле `error` у упавшей проверки, а стек исключения будет записан в логи backend.
 
 Логи в Docker:
 
