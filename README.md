@@ -331,11 +331,13 @@ CHAT_IDS=123456789,-1001234567890
 
 | Сервис | Порт | Назначение |
 | --- | --- | --- |
+| NGINX | `80` | Внешний вход в Grafana |
 | Grafana | `3000` | Дашборды, логи, алерты |
 | Prometheus | `9090` | Хранение метрик |
 | Loki | `3100` | Хранение логов |
 
-Grafana открывается на `http://localhost:3000`.
+Grafana открывается через NGINX на `http://localhost/grafana/`.
+Если подключаетесь с другого устройства, используйте `http://<IP_сервера>/grafana/`.
 Логин по умолчанию: `admin` / значение `GRAFANA_ADMIN_PASSWORD` из `.env`.
 
 ### Необходимые переменные окружения
@@ -375,6 +377,7 @@ TELEGRAM_CHAT_ID=-100xxxxxxxxx
 ### Логи мониторинга
 
 ```bash
+docker compose logs -f nginx
 docker compose logs -f grafana
 docker compose logs -f loki
 docker compose logs -f promtail
