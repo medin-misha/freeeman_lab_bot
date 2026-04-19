@@ -12,14 +12,14 @@ class Messages:
 class Files:
     scale_file_pdf: str = BASE_DIR / "files" / "documents" / "Потолок_внутри_код_расширения_Методичка_апрель.pdf"
     scale_file_epub: str = BASE_DIR / "files" / "documents" / "Потолок_внутри_код_расширения_Методичка_апрель.epub"
-    scale_file_video: str = BASE_DIR / "files" / "videos" / "compressed" / "sircle2.mp4"
-    expanded_diagnostic_video: str = BASE_DIR / "files" / "videos" / "compressed" / "sircle3.mp4"
-    expanded_diagnostic_intro_video: str = BASE_DIR / "files" / "videos" / "compressed" / "sircle4.mp4"
-    diagnostic_result_video: str = BASE_DIR / "files" / "videos" / "compressed" / "sircle5.mp4"
+    scale_file_video: str = BASE_DIR / "files" / "videos" / "sircle2.mp4"
+    expanded_diagnostic_video: str = BASE_DIR / "files" / "videos" / "sircle3.mp4"
+    expanded_diagnostic_intro_video: str = BASE_DIR / "files" / "videos" / "sircle4.mp4"
+    diagnostic_result_video: str = BASE_DIR / "files" / "videos" / "sircle5.mp4"
     analysis_file_pdf: str = BASE_DIR / "files" / "documents" / "ДИАГНОСТИЧЕСКАЯ_ИНСТРУКЦИЯ_КАРТА_МАСШТАБА_ПОТОЛК_ВНУТРИ_КОД_РАСШИРЕНИЯ.pdf"
     wording_of_request_for_analysis: str = BASE_DIR / "files" / "documents" / "Как_правильно_формулировать_запрос.pdf"
     subscribe_preview_image: str = BASE_DIR / "files" / "images" / "preview.jpg"
-    subscribe_video: str = BASE_DIR / "files" / "videos" / "compressed" / "sircle1.mp4"
+    subscribe_video: str = BASE_DIR / "files" / "videos" / "sircle1.mp4"
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
