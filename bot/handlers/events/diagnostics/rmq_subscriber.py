@@ -2,13 +2,13 @@ import logging
 from typing import Any
 
 from aiogram import Bot
-from aiogram.types import BufferedInputFile
+from aiogram.types import BufferedInputFile, FSInputFile
 from faststream.rabbit import RabbitBroker
 
 from config import settings
 from core.utils.api import FileAPI
 
-from .buttons import diagnostic_success_reply_keyboard
+from .buttons import diagnostic_result_reply_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,6 @@ async def handle_diagnostic_response(message: object) -> None:
 
     try:
         downloaded_file = await FileAPI().download_file(file_id)
-        await _bot.send_message(chat_id, "Ваша диагностика готова!")
         await _bot.send_document(
             chat_id=chat_id,
             document=BufferedInputFile(
@@ -48,7 +47,15 @@ async def handle_diagnostic_response(message: object) -> None:
                 filename=downloaded_file.filename,
             ),
         )
-        await _bot.send_message(chat_id, "Теперь вам доступен разбор. Нажмите кнопку 'Разбор' для получения доступа к нему!", reply_markup=diagnostic_success_reply_keyboard())
+        await _bot.send_video(
+            chat_id=chat_id,
+            video=FSInputFile(path=settings.files.diagnostic_result_video),
+        )
+        await _bot.send_message(
+            chat_id,
+            settings.message.text.get("diagnostic_result_ready"),
+            reply_markup=diagnostic_result_reply_keyboard(),
+        )
     except Exception:
         logger.exception(
             "Failed to deliver diagnostic file_id=%s to chat_id=%s",

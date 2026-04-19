@@ -10,11 +10,9 @@
         "result_save_error": "Не удалось сохранить файл диагностики. Попробуйте отправить файл еще раз."
     },
     "buttons": {
-        "send_result": "Отправить результат",
-        "send_file": "Отправить файл"
+        "send_result": "Отправить результат"
     },
     "callback": {
-        "send_result": "send_result",
-        "send_file": "send_file"
+        "send_result": "send_result"
     }
 }

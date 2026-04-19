@@ -208,6 +208,9 @@ telegram-bot-api-data/
 # Local data exports
 result.json
 
+# Local bot media assets
+bot/files/videos/*.mov
+
 # Ruff stuff:
 .ruff_cache/
 

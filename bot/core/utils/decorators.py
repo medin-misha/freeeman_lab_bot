@@ -1,10 +1,7 @@
 from functools import wraps
-
-from core.buttons import start_inline_keyboard
-
 from .funcs import check_sub_channel
 from .api import UserAPI, get_or_create_user
-
+from .global_buttons import start_inline_keyboard
 
 def check_sub_channel_dec(func):
     @wraps(func)

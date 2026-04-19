@@ -3,6 +3,12 @@ from aiogram.types import Audio, Document, FSInputFile, Voice
 from aiogram.fsm.context import FSMContext
 
 from .states import DiagnosticStates
+from .buttons import (
+    basic_diagnostic_reply_keyboard,
+    diagnostic_menu_reply_keyboard,
+    expanded_diagnostic_ready_reply_keyboard,
+    expanded_diagnostic_upload_reply_keyboard,
+)
 from core.utils.api import DiagnosticsAPI
 
 from config import settings
@@ -49,23 +55,86 @@ async def _send_diagnostic(
     )
     await state.clear()
     await msg.answer(
-        text="Спасибо, я получил твой файл. Скоро я его просмотрю и дам обратную связь",
+        text=settings.message.text.get("expanded_diagnostic_received"),
         reply_markup=types.ReplyKeyboardRemove(),
     )
 
 
-@router.message(F.text.lower() == "диагностика")
+async def _send_diagnostic_menu(msg: types.Message, state: FSMContext) -> None:
+    await state.clear()
+    await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_video")
+    await msg.answer_video(
+        video=FSInputFile(path=settings.files.expanded_diagnostic_video),
+    )
+    await msg.answer(
+        text=settings.message.text.get("expanded_diagnostic_intro"),
+        reply_markup=diagnostic_menu_reply_keyboard(),
+    )
+
+
+@router.message(F.text.lower() == "пройти диагностиĸу")
+@ensure_user_registered
+@check_sub_channel_dec
+async def diagnostic_menu_handler(msg: types.Message, state: FSMContext):
+    await _send_diagnostic_menu(msg, state)
+
+
+@router.message(F.text.lower() == "базовая диагностиĸа")
+@ensure_user_registered
+@check_sub_channel_dec
+async def basic_diagnostic_handler(msg: types.Message, state: FSMContext):
+    await state.clear()
+    await msg.answer(
+        text=settings.message.text.get("basic_diagnostic_intro"),
+        reply_markup=basic_diagnostic_reply_keyboard(),
+    )
+
+
+@router.message(F.text.lower() == "зачем мне диагностиĸа")
+@ensure_user_registered
+@check_sub_channel_dec
+async def why_diagnostic_handler(msg: types.Message, state: FSMContext):
+    await state.clear()
+    await msg.answer(
+        text=settings.message.text.get("why_diagnostic_intro"),
+        reply_markup=basic_diagnostic_reply_keyboard(),
+    )
+
+
+@router.message(F.text.lower() == "назад ĸ диагностиĸе")
+@ensure_user_registered
+@check_sub_channel_dec
+async def back_to_diagnostic_handler(msg: types.Message, state: FSMContext):
+    await _send_diagnostic_menu(msg, state)
+
+
+@router.message(F.text.lower() == "пройти расширенную диагностиĸу")
+@ensure_user_registered
+@check_sub_channel_dec
+async def expanded_diagnostic_start_handler(msg: types.Message, state: FSMContext):
+    await state.clear()
+    await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_video")
+    await msg.answer_video(
+        video=FSInputFile(path=settings.files.expanded_diagnostic_intro_video),
+    )
+    await msg.answer_document(
+        document=FSInputFile(path=settings.files.analysis_file_pdf),
+    )
+    await msg.answer(
+        text=settings.message.text.get("expanded_diagnostic_start"),
+        reply_markup=expanded_diagnostic_ready_reply_keyboard(),
+    )
+
+
+@router.message(F.text.lower() == "я готов(а), отправляю аудио")
 @ensure_user_registered
 @check_sub_channel_dec
 async def analysis_handler(msg: types.Message, state: FSMContext):
-    await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_document")
-    await msg.answer(text=settings.message.text.get("diagnostic"))
-    await msg.reply_document(
-        document=FSInputFile(path=settings.files.analysis_file_pdf),
-        caption=settings.message.text
-        .get("diagnostic_getters").get("read_diagnostic_file")
-        + "\n" + settings.message.text
-        .get("diagnostic_getters").get("get_data_for_diagnostic_prompt"),
+    await state.clear()
+    await msg.bot.send_chat_action(chat_id=msg.chat.id, action="typing")
+    await msg.answer(
+        text=settings.message.text.get("expanded_diagnostic_upload_prompt"),
+        reply_markup=expanded_diagnostic_upload_reply_keyboard(),
     )
     await state.set_state(DiagnosticStates.waiting_for_audio)
 

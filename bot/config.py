@@ -10,10 +10,16 @@ class Messages:
         text: dict = json.load(f)
 
 class Files:
-    scale_file_pdf: str = BASE_DIR / "files" / "Потолок_внутри_код_расширения_Методичка_апрель.pdf"
-    scale_file_epub: str = BASE_DIR / "files" / "Потолок_внутри_код_расширения_Методичка_апрель.epub"
-    analysis_file_pdf: str = BASE_DIR / "files" / "ДИАГНОСТИЧЕСКАЯ_ИНСТРУКЦИЯ_КАРТА_МАСШТАБА_ПОТОЛК_ВНУТРИ_КОД_РАСШИРЕНИЯ.pdf"
-    wording_of_request_for_analysis: str = BASE_DIR / "files" / "Как_правильно_формулировать_запрос.pdf"
+    scale_file_pdf: str = BASE_DIR / "files" / "documents" / "Потолок_внутри_код_расширения_Методичка_апрель.pdf"
+    scale_file_epub: str = BASE_DIR / "files" / "documents" / "Потолок_внутри_код_расширения_Методичка_апрель.epub"
+    scale_file_video: str = BASE_DIR / "files" / "videos" / "sircle2.mov"
+    expanded_diagnostic_video: str = BASE_DIR / "files" / "videos" / "sircle3.mov"
+    expanded_diagnostic_intro_video: str = BASE_DIR / "files" / "videos" / "sircle4.mov"
+    diagnostic_result_video: str = BASE_DIR / "files" / "videos" / "sircle5.mov"
+    analysis_file_pdf: str = BASE_DIR / "files" / "documents" / "ДИАГНОСТИЧЕСКАЯ_ИНСТРУКЦИЯ_КАРТА_МАСШТАБА_ПОТОЛК_ВНУТРИ_КОД_РАСШИРЕНИЯ.pdf"
+    wording_of_request_for_analysis: str = BASE_DIR / "files" / "documents" / "Как_правильно_формулировать_запрос.pdf"
+    subscribe_preview_image: str = BASE_DIR / "files" / "images" / "preview.jpg"
+    subscribe_video: str = BASE_DIR / "files" / "videos" / "sircle1.mov"
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(

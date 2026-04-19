@@ -8,13 +8,13 @@ def start_inline_keyboard() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Вступить",
+                    text="Подписаться",
                     url="https://t.me/alexfreemanlifelab",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="🟩Уже вступил🟩",
+                    text="🟩Я подписался(ась)🟩",
                     callback_data=settings.message.text.get("callback").get(
                         "check_subscribe"
                     ),

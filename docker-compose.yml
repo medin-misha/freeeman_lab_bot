@@ -27,6 +27,9 @@ services:
     depends_on:
       freeman-minio:
         condition: service_started
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     networks:
       - freeeman-network
     healthcheck:
