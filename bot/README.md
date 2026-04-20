@@ -45,6 +45,7 @@ docker compose up --build -d
 | `RMQ_URL` | да | RabbitMQ URL |
 | `RMQ_DIAGNOSTIC_RESPONSE_QUEUE` | да | очередь с готовыми результатами диагностик |
 | `RMQ_NUCLEUS_APPLICATION_QUEUE` | да | очередь, в которую бот публикует заявки в `Ядро` |
+| `RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE` | нет | очередь, в которую бот публикует подтверждения записи на разбор |
 | `TELEGRAM_BOT_API_URL` | да | адрес локального Telegram Bot API server |
 
 Пример для локального запуска:
@@ -56,6 +57,7 @@ CHANNEL_ID=@your_channel
 RMQ_URL=amqp://guest:guest@localhost:5672/
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
 RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
+RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE=analysis_schedule_confirmation
 TELEGRAM_BOT_API_URL=http://localhost:8081
 ```
 
@@ -68,6 +70,7 @@ CHANNEL_ID=@your_channel
 RMQ_URL=amqp://guest:guest@host.docker.internal:5672/
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
 RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
+RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE=analysis_schedule_confirmation
 TELEGRAM_BOT_API_URL=http://telegram-bot-api:8081
 ```
 

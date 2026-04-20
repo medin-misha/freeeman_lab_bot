@@ -7,6 +7,7 @@ from aiogram.client.telegram import TelegramAPIServer
 
 from config import settings
 from handlers import main_router
+from handlers.events.analysis import set_bot_instance as set_analysis_bot_instance
 from handlers.events.diagnostics import broker as diagnostic_broker
 from handlers.events.diagnostics import set_bot_instance as set_diagnostic_bot_instance
 from handlers.events.nucleus import set_bot_instance as set_nucleus_bot_instance
@@ -29,6 +30,7 @@ async def main() -> None:
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
     dp.include_router(main_router)
+    set_analysis_bot_instance(bot)
     set_diagnostic_bot_instance(bot)
     set_nucleus_bot_instance(bot)
     await diagnostic_broker.start()

@@ -35,6 +35,10 @@ class Settings(BaseSettings):
         default="nucleus_application",
         validation_alias="RMQ_NUCLEUS_APPLICATION_QUEUE"
     )
+    analysis_schedule_confirmation_queue: str = Field(
+        default="analysis_schedule_confirmation",
+        validation_alias="RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE"
+    )
     chat_ids: str = Field(validation_alias="CHAT_IDS")
     message: Messages = Messages()
 

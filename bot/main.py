@@ -10,6 +10,7 @@ import logging
 from config import settings
 from handlers.events.diagnostics import broker as diagnostic_broker
 from handlers.events.diagnostics import set_bot_instance as set_diagnostic_bot_instance
+from handlers.events.analysis.publisher import broker as analysis_broker
 from handlers.events.nucleus import broker as nucleus_broker
 
 logger = logging.getLogger(__name__)
@@ -33,11 +34,15 @@ async def main():
         set_diagnostic_bot_instance(bot)
         await diagnostic_broker.start()
         try:
-            await nucleus_broker.start()
+            await analysis_broker.start()
             try:
-                await dp.start_polling(bot)
+                await nucleus_broker.start()
+                try:
+                    await dp.start_polling(bot)
+                finally:
+                    await nucleus_broker.close()
             finally:
-                await nucleus_broker.close()
+                await analysis_broker.close()
         finally:
             await diagnostic_broker.close()
     except Exception:

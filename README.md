@@ -232,6 +232,7 @@ RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
 | `RMQ_URL` | да | URL RabbitMQ для очереди ответов |
 | `RMQ_DIAGNOSTIC_RESPONSE_QUEUE` | да | очередь, из которой бот получает готовые диагностики |
 | `RMQ_NUCLEUS_APPLICATION_QUEUE` | да | очередь, в которую пользовательский бот публикует заявки в `Ядро` |
+| `RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE` | нет | очередь, в которую пользовательский бот публикует подтверждения записи на разбор |
 | `TELEGRAM_BOT_API_URL` | да | URL локального Telegram Bot API server |
 
 Пример для локального запуска:
@@ -243,6 +244,7 @@ CHANNEL_ID=@your_channel
 RMQ_URL=amqp://guest:guest@localhost:5672/
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
 RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
+RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE=analysis_schedule_confirmation
 TELEGRAM_BOT_API_URL=http://localhost:8081
 ```
 
@@ -255,6 +257,7 @@ CHANNEL_ID=@your_channel
 RMQ_URL=amqp://guest:guest@host.docker.internal:5672/
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
 RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
+RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE=analysis_schedule_confirmation
 TELEGRAM_BOT_API_URL=http://telegram-bot-api:8081
 ```
 
@@ -274,6 +277,7 @@ TELEGRAM_BOT_API_URL=http://telegram-bot-api:8081
 | `RMQ_URL` | да | URL RabbitMQ |
 | `RMQ_DIAGNOSTIC_REQUEST_QUEUE` | да | очередь входящих диагностик |
 | `RMQ_DIAGNOSTIC_RESPONSE_QUEUE` | да | очередь исходящих результатов |
+| `RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE` | нет | очередь подтверждений записи на разбор |
 | `CHAT_IDS` | да | список Telegram chat id администраторов через запятую |
 
 Пример:
@@ -286,6 +290,7 @@ TELEGRAM_BOT_API_URL=http://localhost:8081
 RMQ_URL=amqp://guest:guest@localhost:5672/
 RMQ_DIAGNOSTIC_REQUEST_QUEUE=diagnostic_request
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
+RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE=analysis_schedule_confirmation
 CHAT_IDS=123456789,-1001234567890
 ```
 
