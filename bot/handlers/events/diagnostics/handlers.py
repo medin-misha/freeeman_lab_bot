@@ -6,6 +6,7 @@ from .states import DiagnosticStates
 from .buttons import (
     basic_diagnostic_reply_keyboard,
     diagnostic_menu_reply_keyboard,
+    diagnostic_sent_reply_keyboard,
     expanded_diagnostic_ready_reply_keyboard,
     expanded_diagnostic_upload_reply_keyboard,
 )
@@ -56,7 +57,7 @@ async def _send_diagnostic(
     await state.clear()
     await msg.answer(
         text=settings.message.text.get("expanded_diagnostic_received"),
-        reply_markup=types.ReplyKeyboardRemove(),
+        reply_markup=diagnostic_sent_reply_keyboard(),
     )
 
 

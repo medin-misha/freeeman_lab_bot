@@ -116,6 +116,16 @@ def expanded_diagnostic_upload_reply_keyboard() -> ReplyKeyboardMarkup:
     )
 
 
+def diagnostic_sent_reply_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text="Назад в меню")
+            ],
+        ]
+    )
+
+
 def basic_diagnostic_reply_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
