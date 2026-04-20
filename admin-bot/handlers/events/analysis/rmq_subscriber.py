@@ -32,18 +32,21 @@ async def handle_analysis_schedule_confirmation(message: object) -> None:
     else:
         format_label = "публичный"
 
+    username = _extract_text(message, "username") or "не указан"
     confirmed_at = _extract_text(message, "confirmed_at") or "Не указано"
 
     notification_text = settings.message.text.get("notifications", {}).get(
         "analysis_schedule_confirmation",
         (
             "Новая запись на разбор\n\n"
+            "Username: {username}\n"
             "Формат разбора: {format_label}\n"
             "● анкета заполнена\n"
             "● расписание подтверждено\n"
             "● дата / время: {confirmed_at}"
         ),
     ).format(
+        username=username,
         format_label=format_label,
         confirmed_at=confirmed_at,
     )

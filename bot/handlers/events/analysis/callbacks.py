@@ -20,12 +20,14 @@ logger = logging.getLogger(__name__)
 
 async def _publish_analysis_schedule_confirmation(
     format_name: str,
+    username: str | None,
 ) -> None:
     confirmed_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     await publish_analysis_schedule_confirmation(
         {
             "analysis_format": format_name,
             "confirmed_at": confirmed_at,
+            "username": username or "",
         }
     )
 
@@ -121,7 +123,10 @@ async def analysis_public_schedule_confirmed_callback(
         return
 
     try:
-        await _publish_analysis_schedule_confirmation("public")
+        await _publish_analysis_schedule_confirmation(
+            "public",
+            query.from_user.username,
+        )
     except Exception:
         logger.exception("Failed to publish public analysis schedule confirmation")
 
@@ -147,7 +152,10 @@ async def analysis_private_schedule_confirmed_callback(
         return
 
     try:
-        await _publish_analysis_schedule_confirmation("private")
+        await _publish_analysis_schedule_confirmation(
+            "private",
+            query.from_user.username,
+        )
     except Exception:
         logger.exception("Failed to publish private analysis schedule confirmation")
 

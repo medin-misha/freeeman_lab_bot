@@ -3,7 +3,7 @@
     "notifications": {
         "diagnostic_request": "Пользователь ({display_name}) хочет пройти диагностику\n\nОписание:\n{description}",
         "nucleus_application": "Новая заявка в «Ядро»\n\nUsername: {username}\nИмя / фамилия: {full_name}\nДата / время: {submitted_at}\n\nТеĸст заявĸи:\n{application_text}",
-        "analysis_schedule_confirmation": "Новая запись на разбор\n\nФормат разбора: {format_label}\n● анĸета заполнена\n● расписание подтверждено\n● дата / время: {confirmed_at}"
+        "analysis_schedule_confirmation": "Новая запись на разбор\n\nUsername: {username}\nФормат разбора: {format_label}\n● анĸета заполнена\n● расписание подтверждено\n● дата / время: {confirmed_at}"
     },
     "diagnostics": {
         "wait_for_result_file": "Жду файл диагностики для этого пользователя.",
