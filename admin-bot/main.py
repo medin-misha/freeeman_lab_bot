@@ -2,6 +2,8 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.telegram import TelegramAPIServer
 
@@ -20,7 +22,11 @@ session = AiohttpSession(
         is_local=True,
     )
 )
-bot = Bot(token=BOT_TOKEN, session=session)
+bot = Bot(
+    token=BOT_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+    session=session,
+)
 dp = Dispatcher()
 
 

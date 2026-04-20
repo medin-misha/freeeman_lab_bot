@@ -1,15 +1,15 @@
 {
-    "start": "Admin bot active",
+    "start": "<b>Admin bot active</b>",
     "notifications": {
-        "diagnostic_request": "Пользователь ({display_name}) хочет пройти диагностику\n\nОписание:\n{description}",
-        "nucleus_application": "Новая заявка в «Ядро»\n\nUsername: {username}\nИмя / фамилия: {full_name}\nДата / время: {submitted_at}\n\nТеĸст заявĸи:\n{application_text}",
-        "analysis_schedule_confirmation": "Новая запись на разбор\n\nUsername: {username}\nФормат разбора: {format_label}\n● анĸета заполнена\n● расписание подтверждено\n● дата / время: {confirmed_at}"
+        "diagnostic_request": "<b>Пользователь хочет пройти диагностику</b>\n\n<b>Пользователь:</b> {display_name}\n\n<b>Описание:</b>\n{description}",
+        "nucleus_application": "<b>Новая заявка в «Ядро»</b>\n\n<b>Username:</b> {username}\n<b>Имя / фамилия:</b> {full_name}\n<b>Дата / время:</b> {submitted_at}\n\n<b>Теĸст заявĸи:</b>\n{application_text}",
+        "analysis_schedule_confirmation": "<b>Новая запись на разбор</b>\n\n<b>Username:</b> {username}\n<b>Формат разбора:</b> {format_label}\n• анĸета заполнена\n• расписание подтверждено\n• дата / время: {confirmed_at}"
     },
     "diagnostics": {
-        "wait_for_result_file": "Жду файл диагностики для этого пользователя.",
-        "invalid_attachment": "Ожидаю файл диагностики документом",
-        "result_saved": "Файл диагностики сохранен.",
-        "result_save_error": "Не удалось сохранить файл диагностики. Попробуйте отправить файл еще раз."
+        "wait_for_result_file": "<b>Жду файл диагностики</b> для этого пользователя.",
+        "invalid_attachment": "<b>Ожидаю файл диагностики</b> документом",
+        "result_saved": "<b>Файл диагностики сохранен.</b>",
+        "result_save_error": "<b>Не удалось сохранить файл диагностики.</b>\n\nПопробуйте отправить файл еще раз."
     },
     "buttons": {
         "send_result": "Отправить результат"
