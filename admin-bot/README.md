@@ -10,6 +10,7 @@ Create `admin-bot/.env` with:
 - `API_URL`
 - `RMQ_URL`
 - `RMQ_DIAGNOSTIC_REQUEST_QUEUE`
+- `RMQ_NUCLEUS_APPLICATION_QUEUE`
 - `CHAT_IDS`
 
 `CHAT_IDS` must be a comma-separated list of Telegram chat IDs.
@@ -17,6 +18,7 @@ Create `admin-bot/.env` with:
 ## Behavior
 
 - queue message with `id`, `file_id`, `user_id` -> sends a notification, source voice, and "Отправить результат" button to all configured chats
+- queue message with nucleus application data -> sends a text notification about a new `Ядро` application to all configured chats
 - `/start` from an allowed chat -> replies `Admin bot active`
 - clicking the result button -> puts the chat into result upload mode
 - sending a document or audio file in that mode -> uploads the file to backend and marks the diagnostic as completed

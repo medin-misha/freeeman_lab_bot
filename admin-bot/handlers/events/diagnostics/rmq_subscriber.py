@@ -2,9 +2,9 @@ import logging
 
 from aiogram import Bot
 from aiogram.types import BufferedInputFile
-from faststream.rabbit import RabbitBroker
 
 from config import settings
+from core.rmq import broker
 from core.utils import (
     DownloadedFile,
     FileAPI,
@@ -20,8 +20,6 @@ from .buttons import send_result_inline_keyboard
 
 
 logger = logging.getLogger(__name__)
-
-broker = RabbitBroker(settings.rmq_url)
 _bot: Bot | None = None
 
 user_api = UserAPI()

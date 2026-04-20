@@ -1,7 +1,8 @@
 {
     "start": "Admin bot active",
     "notifications": {
-        "diagnostic_request": "Пользователь ({display_name}) хочет пройти диагностику\n\nОписание:\n{description}"
+        "diagnostic_request": "Пользователь ({display_name}) хочет пройти диагностику\n\nОписание:\n{description}",
+        "nucleus_application": "Новая заявка в «Ядро»\n\nUsername: {username}\nИмя / фамилия: {full_name}\nДата / время: {submitted_at}\n\nТеĸст заявĸи:\n{application_text}"
     },
     "diagnostics": {
         "wait_for_result_file": "Жду файл диагностики для этого пользователя.",

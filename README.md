@@ -231,6 +231,7 @@ RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
 | `CHANNEL_ID` | да | Telegram channel username или chat id для проверки подписки |
 | `RMQ_URL` | да | URL RabbitMQ для очереди ответов |
 | `RMQ_DIAGNOSTIC_RESPONSE_QUEUE` | да | очередь, из которой бот получает готовые диагностики |
+| `RMQ_NUCLEUS_APPLICATION_QUEUE` | да | очередь, в которую пользовательский бот публикует заявки в `Ядро` |
 | `TELEGRAM_BOT_API_URL` | да | URL локального Telegram Bot API server |
 
 Пример для локального запуска:
@@ -241,6 +242,7 @@ API_URL=http://localhost:8000
 CHANNEL_ID=@your_channel
 RMQ_URL=amqp://guest:guest@localhost:5672/
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
+RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
 TELEGRAM_BOT_API_URL=http://localhost:8081
 ```
 
@@ -252,6 +254,7 @@ API_URL=http://freeman-backend:8000
 CHANNEL_ID=@your_channel
 RMQ_URL=amqp://guest:guest@host.docker.internal:5672/
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
+RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
 TELEGRAM_BOT_API_URL=http://telegram-bot-api:8081
 ```
 

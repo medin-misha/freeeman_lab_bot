@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     diagnostic_request_queue: str = Field(
         validation_alias="RMQ_DIAGNOSTIC_REQUEST_QUEUE"
     )
+    nucleus_application_queue: str = Field(
+        default="nucleus_application",
+        validation_alias="RMQ_NUCLEUS_APPLICATION_QUEUE"
+    )
     chat_ids: str = Field(validation_alias="CHAT_IDS")
     message: Messages = Messages()
 
