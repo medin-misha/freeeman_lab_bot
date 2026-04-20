@@ -16,6 +16,14 @@ router = Router(name="system")
 user_api = UserAPI()
 
 
+async def send_main_menu(msg: types.Message, state: FSMContext) -> None:
+    await state.clear()
+    await msg.answer(
+        settings.message.text.get("subscribe_success"),
+        reply_markup=start_reply_keyboard(),
+    )
+
+
 @router.message(CommandStart())
 async def start_handler(msg: types.Message, state: FSMContext) -> None:
     await state.clear()
@@ -32,13 +40,8 @@ async def start_handler(msg: types.Message, state: FSMContext) -> None:
             user_api=user_api,
         )
 
-
-@router.message(F.text.lower() == "назад в меню")
+@router.message(F.text.lower().in_(("назад", "назад в меню")))
 @ensure_user_registered
 @check_sub_channel_dec
 async def back_to_menu_handler(msg: types.Message, state: FSMContext) -> None:
-    await state.clear()
-    await msg.answer(
-        settings.message.text.get("subscribe_success"),
-        reply_markup=start_reply_keyboard(),
-    )
+    await send_main_menu(msg, state)

@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from config import settings
-from handlers.events.diagnostics.buttons import diagnostic_result_reply_keyboard
+from handlers.system.handlers import send_main_menu
 from .publisher import publish_analysis_schedule_confirmation
 from .handlers import (
     send_analysis_format_intro,
@@ -43,11 +43,7 @@ async def analysis_back_callback(
     if query.message is None:
         return
 
-    await state.clear()
-    await query.message.answer(
-        text="Выбирай следующий шаг.",
-        reply_markup=diagnostic_result_reply_keyboard(),
-    )
+    await send_main_menu(query.message, state)
 
 
 @router.callback_query(
