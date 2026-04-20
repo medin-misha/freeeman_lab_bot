@@ -50,6 +50,8 @@ async def handle_diagnostic_response(message: object) -> None:
         await _bot.send_video(
             chat_id=chat_id,
             video=FSInputFile(path=settings.files.diagnostic_result_video),
+            width=1080,
+            height=1920,
         )
         await _bot.send_message(
             chat_id,
