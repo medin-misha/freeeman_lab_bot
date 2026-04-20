@@ -14,6 +14,20 @@ def send_voice_inline_keyboard() -> InlineKeyboardMarkup:
         ]
     )
 
+
+def diagnostic_group_inline_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Добавляйся в группу",
+                    url="https://t.me/+tB1WBUwmP-FkOWIy",
+                )
+            ]
+        ]
+    )
+
+
 def confirmation_reply_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[

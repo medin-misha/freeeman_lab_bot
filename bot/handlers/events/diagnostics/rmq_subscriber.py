@@ -8,7 +8,10 @@ from faststream.rabbit import RabbitBroker
 from config import settings
 from core.utils.api import FileAPI
 
-from .buttons import diagnostic_result_reply_keyboard
+from .buttons import (
+    diagnostic_group_inline_keyboard,
+    diagnostic_result_reply_keyboard,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +60,11 @@ async def handle_diagnostic_response(message: object) -> None:
             chat_id,
             settings.message.text.get("diagnostic_result_ready"),
             reply_markup=diagnostic_result_reply_keyboard(),
+        )
+        await _bot.send_message(
+            chat_id,
+            "Добавляйся в группу:",
+            reply_markup=diagnostic_group_inline_keyboard(),
         )
     except Exception:
         logger.exception(
