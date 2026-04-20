@@ -26,6 +26,8 @@ async def check_subscribe_callback(query: CallbackQuery, bot: Bot):
         )
         await query.message.answer_video(
             video=FSInputFile(path=settings.files.subscribe_video),
+            width=1080,
+            height=1920,
         )
         await query.message.answer(
             text=settings.message.text.get("subscribe_success"),

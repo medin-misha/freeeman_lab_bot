@@ -24,6 +24,8 @@ async def mashtab_handler(msg: types.Message):
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_video")
     await msg.answer_video(
         video=FSInputFile(path=settings.files.scale_file_video),
+        width=1080,
+        height=1920,
     )
     await msg.answer(
         text=settings.message.text.get("scale2"),

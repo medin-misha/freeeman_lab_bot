@@ -34,6 +34,8 @@ async def send_nucleus_intro(msg: Message, state: FSMContext) -> None:
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_video")
     await msg.answer_video(
         video=FSInputFile(path=settings.files.nucleus_intro_video),
+        width=1080,
+        height=1920,
     )
     await msg.answer(
         text=settings.message.text.get("nucleus_intro"),

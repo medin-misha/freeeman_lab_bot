@@ -65,6 +65,8 @@ async def _send_diagnostic_menu(msg: types.Message, state: FSMContext) -> None:
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_video")
     await msg.answer_video(
         video=FSInputFile(path=settings.files.expanded_diagnostic_video),
+        width=1080,
+        height=1920,
     )
     await msg.answer(
         text=settings.message.text.get("expanded_diagnostic_intro"),
@@ -116,6 +118,8 @@ async def expanded_diagnostic_start_handler(msg: types.Message, state: FSMContex
     await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_video")
     await msg.answer_video(
         video=FSInputFile(path=settings.files.expanded_diagnostic_intro_video),
+        width=1080,
+        height=1920,
     )
     await msg.answer_document(
         document=FSInputFile(path=settings.files.analysis_file_pdf),
