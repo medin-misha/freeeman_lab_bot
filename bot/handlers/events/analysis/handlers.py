@@ -1,47 +1,121 @@
 from aiogram import F, Router
-from aiogram.types import FSInputFile, Message
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 from config import settings
 
 from .buttons import (
-    FORM_FILLED_TEXT,
-    analysis_form_filled_reply_keyboard,
+    analysis_back_reply_keyboard,
+    analysis_entry_inline_keyboard,
     analysis_format_inline_keyboard,
-    schedule_inline_keyboard,
-    wording_of_request_for_analysis_inline_keyboard,
+    analysis_schedule_inline_keyboard,
 )
+from .states import AnalysisStates
 from core.utils import ensure_user_registered
+from handlers.events.diagnostics.buttons import diagnostic_result_reply_keyboard
 
 router = Router(name="analysis_handlers")
 
 
-@router.message(F.text.lower() == "разбор")
-@ensure_user_registered
-async def analysis_entry_handler(msg: Message) -> None:
-    await msg.bot.send_chat_action(chat_id=msg.chat.id, action="upload_document")
-    await msg.bot.send_document(
-        chat_id=msg.chat.id,
-        document=FSInputFile(settings.files.wording_of_request_for_analysis),
-        caption=settings.message.text.get("wording_of_request_for_analysis"),
-        reply_markup=wording_of_request_for_analysis_inline_keyboard(),
-    )
-
-@router.message(F.text.lower() == "я готов к разбору!")
-@ensure_user_registered
-async def analysis_options_handler(msg: Message) -> None:
+async def send_analysis_entry(
+    msg: Message,
+    state: FSMContext,
+) -> None:
+    await state.set_state(AnalysisStates.choosing_format)
     await msg.answer(
-        text=settings.message.text.get("handler"),
-        reply_markup=analysis_format_inline_keyboard(),
-    )
-    await msg.answer(
-        text="После заполнения формы нажми кнопку ниже.",
-        reply_markup=analysis_form_filled_reply_keyboard(),
+        text=settings.message.text.get("analysis_intro"),
+        reply_markup=analysis_entry_inline_keyboard(),
     )
 
 
-@router.message(F.text.lower() == FORM_FILLED_TEXT.lower())
-@ensure_user_registered
-async def analysis_form_filled_handler(msg: Message) -> None:
+async def send_analysis_format_intro(
+    msg: Message,
+    state: FSMContext,
+    format_name: str,
+) -> None:
+    if format_name == "public":
+        await state.set_state(AnalysisStates.public_intro)
+        text = settings.message.text.get("analysis_public_intro")
+    else:
+        await state.set_state(AnalysisStates.private_intro)
+        text = settings.message.text.get("analysis_private_intro")
+
     await msg.answer(
-        text="Внеси, пожалуйста, своё имя и фамилию в расписание по кнопке ниже.",
-        reply_markup=schedule_inline_keyboard(),
+        text=text,
+        reply_markup=analysis_format_inline_keyboard(format_name),
+    )
+    await msg.answer(
+        text=settings.message.text.get("analysis_back_hint"),
+        reply_markup=analysis_back_reply_keyboard(),
+    )
+
+
+async def send_analysis_schedule_intro(
+    msg: Message,
+    state: FSMContext,
+    format_name: str,
+) -> None:
+    if format_name == "public":
+        await state.set_state(AnalysisStates.public_schedule)
+    else:
+        await state.set_state(AnalysisStates.private_schedule)
+
+    await msg.answer(
+        text=settings.message.text.get("analysis_schedule_intro"),
+        reply_markup=analysis_schedule_inline_keyboard(format_name),
+    )
+    await msg.answer(
+        text=settings.message.text.get("analysis_back_hint"),
+        reply_markup=analysis_back_reply_keyboard(),
+    )
+
+
+@router.message(F.text.lower() == "пойти в разбор")
+@ensure_user_registered
+async def analysis_entry_handler(msg: Message, state: FSMContext) -> None:
+    await state.clear()
+    await send_analysis_entry(msg, state)
+
+
+@router.message(
+    StateFilter(
+        AnalysisStates.choosing_format,
+        AnalysisStates.public_intro,
+        AnalysisStates.private_intro,
+        AnalysisStates.public_schedule,
+        AnalysisStates.private_schedule,
+    ),
+    F.text.lower() == "назад",
+)
+@ensure_user_registered
+async def analysis_back_handler(msg: Message, state: FSMContext) -> None:
+    current_state = await state.get_state()
+
+    if current_state == AnalysisStates.choosing_format.state:
+        await state.clear()
+        await msg.answer(
+            text="Выбирай следующий шаг.",
+            reply_markup=diagnostic_result_reply_keyboard(),
+        )
+        return
+
+    if current_state in {
+        AnalysisStates.public_intro.state,
+        AnalysisStates.private_intro.state,
+    }:
+        await send_analysis_entry(msg, state)
+        return
+
+    if current_state == AnalysisStates.public_schedule.state:
+        await send_analysis_format_intro(msg, state, "public")
+        return
+
+    if current_state == AnalysisStates.private_schedule.state:
+        await send_analysis_format_intro(msg, state, "private")
+        return
+
+    await state.clear()
+    await msg.answer(
+        text="Выбирай следующий шаг.",
+        reply_markup=diagnostic_result_reply_keyboard(),
     )

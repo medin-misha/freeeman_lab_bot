@@ -16,6 +16,7 @@ class Files:
     expanded_diagnostic_video: str = BASE_DIR / "files" / "videos" / "sircle3.mp4"
     expanded_diagnostic_intro_video: str = BASE_DIR / "files" / "videos" / "sircle4.mp4"
     diagnostic_result_video: str = BASE_DIR / "files" / "videos" / "sircle5.mp4"
+    nucleus_intro_video: str = BASE_DIR / "files" / "videos" / "sircle6.mp4"
     analysis_file_pdf: str = BASE_DIR / "files" / "documents" / "ДИАГНОСТИЧЕСКАЯ_ИНСТРУКЦИЯ_КАРТА_МАСШТАБА_ПОТОЛК_ВНУТРИ_КОД_РАСШИРЕНИЯ.pdf"
     wording_of_request_for_analysis: str = BASE_DIR / "files" / "documents" / "Как_правильно_формулировать_запрос.pdf"
     subscribe_preview_image: str = BASE_DIR / "files" / "images" / "preview.jpg"
@@ -34,6 +35,10 @@ class Settings(BaseSettings):
     rmq_url: str = Field(validation_alias="RMQ_URL")
     diagnostic_response_queue: str = Field(
         validation_alias="RMQ_DIAGNOSTIC_RESPONSE_QUEUE"
+    )
+    nucleus_application_queue: str = Field(
+        default="nucleus_application",
+        validation_alias="RMQ_NUCLEUS_APPLICATION_QUEUE"
     )
     message: Messages = Messages()
     files: Files = Files()
