@@ -1,8 +1,0 @@
-apiVersion: 1
-
-contactPoints:
-  - orgId: 1
-    # Placeholder contact point so notification policy provisioning succeeds
-    # even before a real Telegram integration is configured.
-    name: TelegramBotAlert
-    receivers: []
