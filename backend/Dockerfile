@@ -13,7 +13,8 @@ RUN uv sync --frozen --no-dev
 
 COPY .env .env
 COPY . .
+RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["python", "start_backend.py"]
+ENTRYPOINT ["./docker-entrypoint.sh"]

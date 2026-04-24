@@ -1,5 +1,6 @@
 import os
 import socket
+import subprocess
 import sys
 import time
 from typing import Iterable
@@ -73,14 +74,29 @@ def _iter_dependencies() -> Iterable[tuple[str, str, int]]:
     return [candidate for candidate in candidates if candidate is not None]
 
 
-def main() -> None:
-    for name, host, port in _iter_dependencies():
-        _wait_for_dependency(name, host, port)
+def _run_migrations() -> None:
+    print("[startup] applying database migrations", flush=True)
+    subprocess.run(
+        ["uv", "run", "alembic", "upgrade", "head"],
+        check=True,
+    )
+    print("[startup] database migrations applied", flush=True)
 
+
+def _start_server() -> None:
+    print("[startup] starting backend server", flush=True)
     os.execvp(
         "uv",
         ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"],
     )
+
+
+def main() -> None:
+    for name, host, port in _iter_dependencies():
+        _wait_for_dependency(name, host, port)
+
+    _run_migrations()
+    _start_server()
 
 
 if __name__ == "__main__":
