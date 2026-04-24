@@ -62,22 +62,9 @@ services:
     container_name: freeman_backend
     env_file:
       - ./backend/.env
-    environment:
-      DATABASE: postgresql+asyncpg://postgres:postgres@postgres:5432/freeman_test
-      AWS_S3_ENDPOINT_URL: http://freeman-minio:9000
-      RMQ_URL: amqp://guest:guest@rabbitmq:5672/
-      RMQ_DIAGNOSTIC_REQUEST_QUEUE: diagnostic_request
-      RMQ_DIAGNOSTIC_RESPONSE_QUEUE: diagnostic_response
-      RMQ_NUCLEUS_APPLICATION_QUEUE: nucleus_application
     ports:
       - "8000:8000"
     depends_on:
-      postgres:
-        condition: service_healthy
-        required: false
-      rabbitmq:
-        condition: service_healthy
-        required: false
       freeman-minio:
         condition: service_started
     dns:
