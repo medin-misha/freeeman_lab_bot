@@ -1,11 +1,13 @@
 # Bot
 
-Пользовательский Telegram-бот на `aiogram`, который:
+Пользовательский Telegram-бот на `aiogram`, который ведёт пользователя по основным сценариям проекта:
 
-- регистрирует пользователя в `backend`
-- отправляет файлы диагностики в `backend`
-- получает готовые результаты из RabbitMQ
-- присылает пользователю файл результата и открывает следующий шаг сценария
+- вход через подписку на канал
+- выдача методички
+- отправка расширенной диагностики
+- переход к разбору
+- переход в mini app `Ядро`
+- отправка заявок на консультации, регрессии и наставничество
 
 ## Запуск
 
@@ -19,13 +21,11 @@ uv run python main.py
 
 ### В Docker Compose
 
-Из корня репозитория:
-
 ```bash
 docker compose up --build -d freeman-bot
 ```
 
-Если нужен весь стек:
+Для полного стека:
 
 ```bash
 docker compose up --build -d
@@ -35,85 +35,112 @@ docker compose up --build -d
 
 Бот читает переменные из `bot/.env`.
 
-Точные имена:
-
 | Переменная | Обязательна | Описание |
 | --- | --- | --- |
 | `TOKEN` | да | токен Telegram-бота |
 | `API_URL` | да | URL backend |
+| `TELEGRAM_BOT_API_URL` | да | URL Telegram Bot API |
 | `CHANNEL_ID` | да | канал для проверки подписки |
-| `RMQ_URL` | да | RabbitMQ URL |
+| `RMQ_URL` | да | URL RabbitMQ |
 | `RMQ_DIAGNOSTIC_RESPONSE_QUEUE` | да | очередь с готовыми результатами диагностик |
-| `RMQ_NUCLEUS_APPLICATION_QUEUE` | да | очередь, в которую бот публикует заявки в `Ядро` |
-| `RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE` | нет | очередь, в которую бот публикует подтверждения записи на разбор |
-| `TELEGRAM_BOT_API_URL` | да | адрес локального Telegram Bot API server |
+| `RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE` | нет | очередь подтверждений записи на разбор |
+| `RMQ_CONSULTATION_REQUEST_QUEUE` | нет | очередь заявок на консультации |
+| `RMQ_REGRESSION_REQUEST_QUEUE` | нет | очередь заявок на регрессии |
+| `RMQ_MENTORSHIP_REQUEST_QUEUE` | нет | очередь заявок на наставничество |
+| `CORE_MIN_APP` | да | URL mini app для раздела `Ядро` |
 
-Пример для локального запуска:
-
-```env
-TOKEN=123456:telegram-token
-API_URL=http://localhost:8000
-CHANNEL_ID=@your_channel
-RMQ_URL=amqp://guest:guest@localhost:5672/
-RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
-RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
-RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE=analysis_schedule_confirmation
-TELEGRAM_BOT_API_URL=http://localhost:8081
-```
-
-Пример для Docker Compose:
+Пример для тестового Compose:
 
 ```env
-TOKEN=123456:telegram-token
+TOKEN=0000000000:TEST_USER_BOT_TOKEN_FOR_LOCAL_TESTS_ONLY
 API_URL=http://freeman-backend:8000
-CHANNEL_ID=@your_channel
-RMQ_URL=amqp://guest:guest@host.docker.internal:5672/
+CHANNEL_ID=@test_channel
+RMQ_URL=amqp://guest:guest@rabbitmq:5672/
 RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
-RMQ_NUCLEUS_APPLICATION_QUEUE=nucleus_application
 RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE=analysis_schedule_confirmation
-TELEGRAM_BOT_API_URL=http://telegram-bot-api:8081
+RMQ_CONSULTATION_REQUEST_QUEUE=consultation_request
+RMQ_REGRESSION_REQUEST_QUEUE=regression_request
+RMQ_MENTORSHIP_REQUEST_QUEUE=mentorship_request
+TELEGRAM_BOT_API_URL=https://api.telegram.org
+CORE_MIN_APP=https://example.com
 ```
 
-Важно:
+## Что делает бот
 
-- в `docker-compose.yml` `API_URL` дополнительно переопределяется в environment
-- `TELEGRAM_BOT_API_URL` должен совпадать с реальным режимом запуска: `localhost` для локального Python-процесса, `telegram-bot-api` для Docker Compose
+### Входной сценарий
 
-## Сценарий использования
+1. Пользователь отправляет `/start`.
+2. Бот показывает кнопку подписки на сообщество и кнопку проверки подписки.
+3. После подтверждения подписки бот отправляет preview image, видео и главное меню.
 
-Основной пользовательский flow:
+### Главное меню
 
-1. `/start`
-2. подписка на канал
-3. сообщение `МАСШТАБ`
-4. сообщение `ДИАГНОСТИКА`
-5. отправка одного файла диагностики
-6. при необходимости — отдельное текстовое описание
-7. получение результата
+Доступные разделы:
 
-Поддерживаемые типы файла диагностики:
+- `Забрать методичку`
+- `Пройти диагностику`
+- `Ядро`
+- `Еще возможности`
 
-- `voice`
-- `audio`
-- `document`
+### Методичка
 
-Лимит:
+При выборе `Забрать методичку` бот отправляет:
 
-- максимум `1000 МБ`
+- PDF
+- EPUB
+- вертикальное видео
 
-Если файл не подходит:
+### Диагностика
 
-- бот отвечает понятным сообщением, что именно не так
-- серверные ошибки не пробрасываются сырыми текстами, пользователь получает сообщение с просьбой обратиться в поддержку
+Поддерживается расширенная диагностика:
 
-## Что делает бот внутри
+1. Бот показывает intro-видео и PDF-инструкцию.
+2. Пользователь отправляет один файл `voice`, `audio` или `document`.
+3. Максимальный размер файла — `1000 МБ`.
+4. Если описание не приложено в `caption`, бот запрашивает его отдельным текстовым сообщением.
+5. Бот загружает файл в `backend` и создаёт запись диагностики.
+6. После получения результата из RabbitMQ бот отправляет:
+   - документ с результатом
+   - видео результата
+   - меню следующего шага
 
-- `bot/handlers/system/` — `/start` и системные callbacks
-- `bot/handlers/events/scale/` — сценарий `МАСШТАБ`
-- `bot/handlers/events/analysis/` — сценарий `РАЗБОР`
-- `bot/handlers/events/diagnostics/` — загрузка диагностики и получение результата
-- `bot/handlers/errors/` — глобальная маршрутизация ошибок
-- `bot/core/utils/api.py` — HTTP-клиент к backend с нормализацией ошибок
+### Разбор
+
+После диагностики пользователь может перейти в сценарий `Пойти в разбор`:
+
+- выбрать формат `public` или `private`
+- перейти к расписанию
+- подтвердить запись
+
+После подтверждения бот публикует событие в `RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE`.
+
+### Ядро
+
+Кнопка `Ядро` открывает Telegram WebApp по адресу из `CORE_MIN_APP`.
+
+### Еще возможности
+
+Раздел содержит:
+
+- консультации
+- регрессии
+- наставничество
+- соцсети
+- магазин
+- о проекте
+
+Для консультаций, регрессий и наставничества бот публикует сообщения в соответствующие очереди RabbitMQ.
+
+## Внутреннее устройство
+
+- `bot/handlers/system/` — `/start`, проверка подписки, возврат в меню
+- `bot/handlers/events/scale/` — выдача методички
+- `bot/handlers/events/diagnostics/` — сценарий диагностики и получение результата
+- `bot/handlers/events/analysis/` — сценарий разбора
+- `bot/handlers/events/nucleus/` — вход в mini app `Ядро`
+- `bot/handlers/events/more/` — консультации, регрессии, наставничество и доп. разделы
+- `bot/handlers/errors/` — обработка ошибок
+- `bot/core/utils/api.py` — HTTP-клиент к backend
 
 ## Проверка работоспособности
 
@@ -122,9 +149,9 @@ TELEGRAM_BOT_API_URL=http://telegram-bot-api:8081
 - backend доступен по `API_URL`
 - RabbitMQ доступен по `RMQ_URL`
 - Telegram Bot API доступен по `TELEGRAM_BOT_API_URL`
-- бот запущен и polling стартовал без exception в логах
+- polling стартовал без exception в логах
 
-Логи в Docker:
+Логи:
 
 ```bash
 docker compose logs -f freeman-bot
