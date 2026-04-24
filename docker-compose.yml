@@ -1,6 +1,8 @@
 services:
   # --- test 
   postgres:
+    profiles:
+      - test-deps
     image: postgres:16-alpine
     container_name: freeman_test_postgres
     environment:
@@ -20,6 +22,8 @@ services:
     restart: unless-stopped
 
   rabbitmq:
+    profiles:
+      - test-deps
     image: rabbitmq:3.13-management-alpine
     container_name: freeman_test_rabbitmq
     environment:
@@ -38,8 +42,6 @@ services:
     restart: unless-stopped
 
   telegram-bot-api:
-    profiles:
-      - local-telegram-api
     image: aiogram/telegram-bot-api:latest
     environment:
       TELEGRAM_API_ID: ${TELEGRAM_API_ID:-0}
@@ -72,8 +74,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+        required: false
       rabbitmq:
         condition: service_healthy
+        required: false
       freeman-minio:
         condition: service_started
     dns:
@@ -106,6 +110,7 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+        required: false
     volumes:
       - ./telegram-bot-api-data:/var/lib/telegram-bot-api:ro
     networks:
@@ -131,6 +136,7 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+        required: false
     volumes:
       - ./telegram-bot-api-data:/var/lib/telegram-bot-api:ro
     networks:
