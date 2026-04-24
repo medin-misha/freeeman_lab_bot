@@ -122,7 +122,6 @@ services:
     environment:
       API_URL: http://freeman-backend:8000
       RMQ_URL: amqp://guest:guest@rabbitmq:5672/
-      TELEGRAM_BOT_API_URL: https://api.telegram.org
       RMQ_DIAGNOSTIC_REQUEST_QUEUE: diagnostic_request
       RMQ_DIAGNOSTIC_RESPONSE_QUEUE: diagnostic_response
       RMQ_NUCLEUS_APPLICATION_QUEUE: nucleus_application
