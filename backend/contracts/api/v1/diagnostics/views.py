@@ -21,8 +21,8 @@ SessionDepends = Annotated[AsyncSession, Depends(database.get_session)]
 async def create_diagnostics(
     data: DiagnosticsCreate, session: SessionDepends
 ) -> Diagnostics:
-    diagnostic = await CRUD.create(data=data, model=Diagnostics, session=session)
     await publish_diagnostic_request(DiagnosticsRead.model_validate(diagnostic))
+    diagnostic = await CRUD.create(data=data, model=Diagnostics, session=session)
     return diagnostic
 
 

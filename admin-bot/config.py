@@ -39,6 +39,18 @@ class Settings(BaseSettings):
         default="analysis_schedule_confirmation",
         validation_alias="RMQ_ANALYSIS_SCHEDULE_CONFIRMATION_QUEUE"
     )
+    consultation_request_queue: str = Field(
+        default="consultation_request",
+        validation_alias="RMQ_CONSULTATION_REQUEST_QUEUE"
+    )
+    regression_request_queue: str = Field(
+        default="regression_request",
+        validation_alias="RMQ_REGRESSION_REQUEST_QUEUE"
+    )
+    mentorship_request_queue: str = Field(
+        default="mentorship_request",
+        validation_alias="RMQ_MENTORSHIP_REQUEST_QUEUE"
+    )
     chat_ids: str = Field(validation_alias="CHAT_IDS")
     message: Messages = Messages()
 

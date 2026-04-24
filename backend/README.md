@@ -1,14 +1,15 @@
 # Backend
 
-FastAPI backend для проекта `freeeman_lab_bot`.
+FastAPI backend проекта `freeeman_lab_bot`.
 
 Сервис отвечает за:
 
 - CRUD пользователей
 - CRUD диагностик
-- загрузку и выдачу файлов
+- CRUD заявок `Core`
+- загрузку и выдачу файлов через S3 / MinIO
+- health endpoints
 - публикацию событий в RabbitMQ
-- работу с S3 / MinIO
 
 ## Запуск
 
@@ -23,46 +24,32 @@ uv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 ### В Docker Compose
 
-Из корня репозитория:
-
 ```bash
 docker compose up --build -d freeman-backend
 ```
 
+В Docker backend стартует через `start_backend.py`, который ждёт доступности PostgreSQL, RabbitMQ и S3 / MinIO до запуска `uvicorn`.
+
 ## Переменные окружения
 
 Backend читает переменные из `backend/.env`.
-
-Точные имена:
 
 | Переменная | Обязательна | Описание |
 | --- | --- | --- |
 | `DATABASE` | да | строка подключения к PostgreSQL |
 | `AWS_S3_ACCESS_KEY` | да | S3 / MinIO access key |
 | `AWS_S3_SECRERT_KEY` | да | S3 / MinIO secret key |
-| `AWS_S3_BUCKET_NAME` | да | bucket для хранения файлов |
+| `AWS_S3_BUCKET_NAME` | да | bucket для файлов |
 | `AWS_S3_ENDPOINT_URL` | да | endpoint S3 / MinIO |
 | `RMQ_URL` | да | RabbitMQ URL |
 | `RMQ_DIAGNOSTIC_REQUEST_QUEUE` | да | очередь новых диагностик |
 | `RMQ_DIAGNOSTIC_RESPONSE_QUEUE` | да | очередь готовых результатов |
+| `RMQ_NUCLEUS_APPLICATION_QUEUE` | нет | очередь заявок `Ядро` |
 
 Важно:
 
-- код ожидает переменную `AWS_S3_SECRERT_KEY`
-- в названии есть опечатка, и использовать нужно именно её
-
-Пример для локального запуска:
-
-```env
-DATABASE=postgresql+asyncpg://postgres:postgres@localhost:5432/freeman
-AWS_S3_ACCESS_KEY=admin
-AWS_S3_SECRERT_KEY=supersecretpassword
-AWS_S3_BUCKET_NAME=freeman-bucket
-AWS_S3_ENDPOINT_URL=http://localhost:9000
-RMQ_URL=amqp://guest:guest@localhost:5672/
-RMQ_DIAGNOSTIC_REQUEST_QUEUE=diagnostic_request
-RMQ_DIAGNOSTIC_RESPONSE_QUEUE=diagnostic_response
-```
+- код ожидает именно `AWS_S3_SECRERT_KEY`
+- опечатка в имени переменной является частью текущего контракта
 
 ## Миграции
 
@@ -73,7 +60,7 @@ cd backend
 uv run alembic upgrade head
 ```
 
-Посмотреть текущую ревизию:
+Текущая ревизия:
 
 ```bash
 uv run alembic current
@@ -85,31 +72,62 @@ uv run alembic current
 uv run alembic revision -m "description"
 ```
 
-## API
+## HTTP endpoints
 
-Основные endpoints:
+### Service
 
-- `GET /live` — liveness probe, проверяет только что backend отвечает
-- `GET /ready` — readiness probe, проверяет PostgreSQL, RabbitMQ и S3 / MinIO
-- `GET /health` — подробный healthcheck backend, PostgreSQL, RabbitMQ и S3 / MinIO
-- `GET /metrics` — Prometheus-метрики (HTTP request rate, latency, статусы)
-- `POST /users` — создать пользователя
-- `GET /users` — получить пользователей
-- `POST /files/` — загрузить файл
-- `GET /files/{file_id}` — скачать файл
-- `POST /diagnostics` — создать диагностику
-- `GET /diagnostics/{id}` — получить диагностику
-- `PATCH /diagnostics/{id}` — обновить диагностику
+- `GET /live` — liveness probe
+- `GET /ready` — readiness probe с проверкой БД, RabbitMQ и S3
+- `GET /health` — подробный healthcheck
+- `GET /metrics` — Prometheus metrics
 
-После `POST /diagnostics` backend публикует событие в `RMQ_DIAGNOSTIC_REQUEST_QUEUE`.
+### Users
 
-После `PATCH /diagnostics/{id}` с `result_file_id` backend публикует событие в `RMQ_DIAGNOSTIC_RESPONSE_QUEUE`.
+- `POST /users`
+- `GET /users`
+- `GET /users/{id}`
+- `PATCH /users/{id}`
+- `POST /users/bulk`
+- `DELETE /users/{id}`
 
-## Ограничения и особенности
+### Files
 
-- максимальный размер загружаемого файла — `1000 МБ`
+- `POST /files/`
+- `GET /files/`
+- `GET /files/{file_id}`
+
+### Diagnostics
+
+- `POST /diagnostics`
+- `GET /diagnostics`
+- `GET /diagnostics/{id}`
+- `PATCH /diagnostics/{id}`
+- `DELETE /diagnostics/{id}`
+
+### Core
+
+- `GET /core`
+- `GET /core/{id}`
+- `POST /core/submit`
+- `PATCH /core/{id}`
+- `DELETE /core/{id}`
+
+## События RabbitMQ
+
+### Диагностика
+
+- после `POST /diagnostics` backend публикует событие в `RMQ_DIAGNOSTIC_REQUEST_QUEUE`
+- после `PATCH /diagnostics/{id}` с `result_file_id` backend публикует событие в `RMQ_DIAGNOSTIC_RESPONSE_QUEUE`
+
+### Заявка в Ядро
+
+- после `POST /core/submit` backend публикует событие в `RMQ_NUCLEUS_APPLICATION_QUEUE`
+
+## Работа с файлами
+
 - файлы сохраняются в S3 / MinIO
-- backend не стартует без доступных PostgreSQL, RabbitMQ и S3 / MinIO
+- лимит размера upload-файла в backend — `1000 МБ`
+- выдача файла идёт через `GET /files/{file_id}`
 
 ## Проверка работоспособности
 
@@ -119,17 +137,19 @@ curl http://localhost:8000/ready
 curl http://localhost:8000/health
 ```
 
-`/live` при живом процессе backend отвечает так:
+Пример `/live`:
 
 ```json
 {"status":"ok","service":"backend"}
 ```
 
-`/ready` возвращает `200 OK` и `{"status":"ok"}`, если backend готов принимать трафик.
+Если зависимости доступны, `/ready` возвращает `200 OK` и:
 
-Если PostgreSQL, RabbitMQ или S3 / MinIO недоступны, `/ready` и `/health` вернут `503 Service Unavailable`.
+```json
+{"status":"ok"}
+```
 
-Пример ответа `/health` при доступных зависимостях:
+Пример `/health`:
 
 ```json
 {
@@ -143,9 +163,19 @@ curl http://localhost:8000/health
 }
 ```
 
-Если одна из зависимостей недоступна, `/health` вернёт `status: "fail"` и короткое поле `error` у упавшей проверки, а стек исключения будет записан в логи backend.
+Если PostgreSQL, RabbitMQ или S3 / MinIO недоступны, `/ready` и `/health` вернут `503`.
 
-Логи в Docker:
+## Структура
+
+- `backend/main.py` — FastAPI app и health routes
+- `backend/start_backend.py` — startup wrapper для Docker
+- `backend/api/` — HTTP routers
+- `backend/core/models/` — SQLAlchemy models
+- `backend/service/files/` — работа с файлами
+- `backend/service/diagnostic/` — публикация событий диагностики
+- `backend/service/core/` — публикация событий `Ядро`
+
+Логи:
 
 ```bash
 docker compose logs -f freeman-backend

@@ -18,6 +18,10 @@ class RMQSettings(AppSettings):
     url: str = Field(validation_alias="RMQ_URL")
     diagnostic_request_queue: str = Field(validation_alias="RMQ_DIAGNOSTIC_REQUEST_QUEUE")
     diagnostic_response_queue: str = Field(validation_alias="RMQ_DIAGNOSTIC_RESPONSE_QUEUE")
+    nucleus_application_queue: str = Field(
+        default="nucleus_application",
+        validation_alias="RMQ_NUCLEUS_APPLICATION_QUEUE",
+    )
 
 class S3Settings(AppSettings):
     access_key: str = Field(validation_alias="AWS_S3_ACCESS_KEY")
