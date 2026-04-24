@@ -28,17 +28,6 @@ def diagnostic_group_inline_keyboard() -> InlineKeyboardMarkup:
     )
 
 
-def confirmation_reply_keyboard() -> ReplyKeyboardMarkup:
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [
-                KeyboardButton(text="Отправить"),
-                KeyboardButton(text="Ещё раз")
-            ]
-        ],
-        one_time_keyboard=True
-    )
-
 
 def save_as_diagnostic_reply_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
@@ -70,7 +59,7 @@ def diagnostic_result_reply_keyboard() -> ReplyKeyboardMarkup:
                 KeyboardButton(text="Пойти в разбор")
             ],
             [
-                KeyboardButton(text="Узнать про «Ядро»")
+                KeyboardButton(text="Ядро")
             ],
             [
                 KeyboardButton(text="Посмотреть услуги")
