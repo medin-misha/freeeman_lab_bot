@@ -5,6 +5,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
+from .buttons import analysis_back_reply_keyboard
 from config import settings
 from handlers.system.handlers import send_main_menu
 from .publisher import publish_analysis_schedule_confirmation
@@ -129,7 +130,7 @@ async def analysis_public_schedule_confirmed_callback(
     await state.clear()
     await query.message.answer(
         text=settings.message.text.get("analysis_schedule_saved"),
-        reply_markup=diagnostic_result_reply_keyboard(),
+        reply_markup=analysis_back_reply_keyboard(),
     )
 
 
@@ -158,5 +159,5 @@ async def analysis_private_schedule_confirmed_callback(
     await state.clear()
     await query.message.answer(
         text=settings.message.text.get("analysis_schedule_saved"),
-        reply_markup=diagnostic_result_reply_keyboard(),
+        reply_markup=analysis_back_reply_keyboard(),
     )

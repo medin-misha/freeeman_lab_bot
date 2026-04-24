@@ -6,6 +6,7 @@ import json
 import mimetypes
 import re
 from dataclasses import dataclass
+from datetime import date
 from typing import Any
 
 import aiohttp
@@ -216,19 +217,21 @@ class API:
 class UserAPI(API):
     async def add_user(
         self,
+        chat_id: str,
         username: str | None,
         email: str | None,
         phone: str | None,
-        first_name: str | None,
-        last_name: str | None,
-        chat_id: str,
+        full_name: str | None,
+        birth_date: date | None,
+        city: str | None,
     ) -> dict[str, Any]:
         payload = {
             "username": username,
             "email": email,
             "phone": phone,
-            "first_name": first_name,
-            "last_name": last_name,
+            "full_name": full_name,
+            "birth_date": birth_date.isoformat() if birth_date else None,
+            "city": city,
             "chat_id": chat_id,
         }
         return await self.post("/users", payload)
@@ -332,12 +335,13 @@ async def get_or_create_user(
         return users[0]
 
     await user_api.add_user(
+        chat_id=chat_id,
         username=from_user.username,
         email=None,
         phone=None,
-        first_name=from_user.first_name,
-        last_name=from_user.last_name,
-        chat_id=str(from_user.id),
+        full_name=from_user.full_name,
+        birth_date=None,
+        city=None,
     )
     users = await user_api.get_user_bi_chat_id(chat_id)
     if not users:
