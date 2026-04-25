@@ -82,6 +82,9 @@ async def submit_core_form(data: CoreFormSubmit, session: SessionDepends) -> Cor
     await publish_core_application(
         {
             "username": user.username,
+            "full_name": data.full_name,
+            "birth_date": data.birth_date.strftime("%d.%m.%Y"),
+            "city": data.city,
             "activity": core.activity,
             "request": core.request,
             "priorities": core.priorities,

@@ -31,6 +31,9 @@ async def handle_nucleus_application(message: object) -> None:
         "nucleus_application",
         (
             "Новая заявка в «Ядро»\n\n"
+            "Имя:\n<blockquote>{full_name}</blockquote>\n"
+            "Дата рождения:\n<blockquote>{birth_date}</blockquote>\n"
+            "Город:\n<blockquote>{city}</blockquote>\n"
             "Чем занимаешься:\n<blockquote>{activity}</blockquote>\n"
             "Запрос:\n<blockquote>{request}</blockquote>\n"
             "Приоритеты:\n{priorities}\n"
@@ -42,6 +45,9 @@ async def handle_nucleus_application(message: object) -> None:
             "Оплата:\n<blockquote>{payment}</blockquote>"
         ),
     ).format(
+        full_name=_html(_extract_text(message, "full_name") or "не указано"),
+        birth_date=_html(_extract_text(message, "birth_date") or "не указано"),
+        city=_html(_extract_text(message, "city") or "не указано"),
         activity=_html(_extract_text(message, "activity") or "не указано"),
         request=_html(_extract_text(message, "request") or "не указано"),
         priorities=priorities,
