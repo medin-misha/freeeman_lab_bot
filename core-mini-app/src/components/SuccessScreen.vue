@@ -2,6 +2,11 @@
 import { useTelegram } from '../composables/useTelegram.js'
 
 const { close } = useTelegram()
+const waitingListUrl = 'https://t.me/+uJbJ9thccCM0ZDBi'
+
+function openWaitingList() {
+  window.location.href = waitingListUrl
+}
 </script>
 
 <template>
@@ -23,7 +28,7 @@ const { close } = useTelegram()
         <p>Если почувствую, что формат тебе подходит, ты получишь дальнейшую информацию по участию. Ядро — это не массовый вход, а пространство, которое собирается осознанно.</p>
         <div class="success-note">Приложение можно закрыть</div>
         <div class="button-row">
-          <button class="btn btn-ghost" @click="close">ВЕРНУТЬСЯ В БОТ</button>
+          <button class="btn btn-ghost" @click="openWaitingList">ЯДРО | ЛИСТ ОЖИДАНИЯ</button>
           <button class="btn btn-primary" @click="close">ЗАКРЫТЬ</button>
         </div>
       </div>
