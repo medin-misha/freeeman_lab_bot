@@ -17,6 +17,7 @@ class Files:
     expanded_diagnostic_intro_video: str = BASE_DIR / "files" / "videos" / "sircle4.mp4"
     diagnostic_result_video: str = BASE_DIR / "files" / "videos" / "sircle5.mp4"
     analysis_file_pdf: str = BASE_DIR / "files" / "documents" / "ДИАГНОСТИЧЕСКАЯ_ИНСТРУКЦИЯ_КАРТА_МАСШТАБА_ПОТОЛК_ВНУТРИ_КОД_РАСШИРЕНИЯ.pdf"
+    invisibility_diagnostic_file_pdf: str = BASE_DIR / "files" / "documents" / "Инструкция_Диагностика_невидимости.pdf"
     wording_of_request_for_analysis: str = BASE_DIR / "files" / "documents" / "Как_правильно_формулировать_запрос.pdf"
     subscribe_preview_image: str = BASE_DIR / "files" / "images" / "preview.jpg"
     subscribe_video: str = BASE_DIR / "files" / "videos" / "sircle1.mp4"

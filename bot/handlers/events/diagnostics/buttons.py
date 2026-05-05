@@ -75,7 +75,10 @@ def diagnostic_menu_reply_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [
-                KeyboardButton(text="Пройти расширенную диагностиĸу")
+                KeyboardButton(text="Расширенная диагностика")
+            ],
+            [
+                KeyboardButton(text="Диагностика невидимости")
             ],
             [
                 KeyboardButton(text="Базовая диагностиĸа")
@@ -119,6 +122,22 @@ def expanded_diagnostic_upload_reply_keyboard() -> ReplyKeyboardMarkup:
     )
 
 
+def diagnostic_type_selection_reply_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text="Расширенная диагностика")
+            ],
+            [
+                KeyboardButton(text="Диагностика невидимости")
+            ],
+            [
+                KeyboardButton(text="Назад в меню")
+            ],
+        ]
+    )
+
+
 def diagnostic_sent_reply_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
@@ -133,7 +152,10 @@ def basic_diagnostic_reply_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [
-                KeyboardButton(text="Пройти расширенную диагностиĸу")
+                KeyboardButton(text="Расширенная диагностика")
+            ],
+            [
+                KeyboardButton(text="Диагностика невидимости")
             ],
             [
                 KeyboardButton(text="Назад ĸ диагностиĸе")

@@ -15,6 +15,23 @@ from service.diagnostic.publisher import (
 router = APIRouter(tags=["diagnostics"], prefix="/diagnostics")
 
 SessionDepends = Annotated[AsyncSession, Depends(database.get_session)]
+EXPANDED_DIAGNOSTIC_TAG = "#расширенная_диагностика"
+INVISIBILITY_DIAGNOSTIC_TAG = "#диагностика_невидимости"
+EXPANDED_DIAGNOSTIC_TYPE = "expanded"
+INVISIBILITY_DIAGNOSTIC_TYPE = "invisibility"
+
+
+def _detect_diagnostic_type(description: str | None) -> str | None:
+    if not description:
+        return None
+
+    tags = set(description.split())
+    if INVISIBILITY_DIAGNOSTIC_TAG in tags:
+        return INVISIBILITY_DIAGNOSTIC_TYPE
+    if EXPANDED_DIAGNOSTIC_TAG in tags:
+        return EXPANDED_DIAGNOSTIC_TYPE
+
+    return None
 
 
 @router.post("", response_model=DiagnosticsRead, status_code=status.HTTP_201_CREATED)
@@ -60,6 +77,7 @@ async def patch_diagnostics(
         await publish_diagnostic_response(
             chat_id=user.chat_id,
             file_id=diagnostic.result_file_id,
+            diagnostic_type=_detect_diagnostic_type(diagnostic.description),
         )
 
     return diagnostic

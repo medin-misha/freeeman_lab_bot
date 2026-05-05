@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 broker = RabbitBroker(settings.rmq_url)
 _bot: Bot | None = None
+EXPANDED_DIAGNOSTIC_TYPE = "expanded"
+INVISIBILITY_DIAGNOSTIC_TYPE = "invisibility"
 
 
 def set_bot_instance(bot: Bot) -> None:
@@ -28,6 +30,7 @@ def set_bot_instance(bot: Bot) -> None:
 async def handle_diagnostic_response(message: object) -> None:
     chat_id = _extract_chat_id(message)
     file_id = _extract_file_id(message)
+    diagnostic_type = _extract_diagnostic_type(message)
 
     if chat_id is None:
         logger.warning("Diagnostic response event does not contain chat_id: %r", message)
@@ -50,15 +53,16 @@ async def handle_diagnostic_response(message: object) -> None:
                 filename=downloaded_file.filename,
             ),
         )
-        await _bot.send_video(
-            chat_id=chat_id,
-            video=FSInputFile(path=settings.files.diagnostic_result_video),
-            width=1080,
-            height=1920,
-        )
+        if diagnostic_type != INVISIBILITY_DIAGNOSTIC_TYPE:
+            await _bot.send_video(
+                chat_id=chat_id,
+                video=FSInputFile(path=settings.files.diagnostic_result_video),
+                width=1080,
+                height=1920,
+            )
         await _bot.send_message(
             chat_id,
-            settings.message.text.get("diagnostic_result_ready"),
+            _get_result_message_text(diagnostic_type),
             reply_markup=diagnostic_result_reply_keyboard(),
         )
         await _bot.send_message(
@@ -114,6 +118,25 @@ def _extract_file_id(message: object) -> int | None:
         return int(value)
 
     return None
+
+
+def _extract_diagnostic_type(message: object) -> str | None:
+    value = _extract_value(message, "diagnostic_type")
+    if not isinstance(value, str):
+        return None
+
+    diagnostic_type = value.strip().lower()
+    return diagnostic_type or None
+
+
+def _get_result_message_text(diagnostic_type: str | None) -> str:
+    if diagnostic_type == INVISIBILITY_DIAGNOSTIC_TYPE:
+        return settings.message.text.get(
+            "invisibility_diagnostic_result_ready",
+            settings.message.text.get("diagnostic_result_ready"),
+        )
+
+    return settings.message.text.get("diagnostic_result_ready")
 
 
 def _extract_value(message: object, field_name: str) -> Any:

@@ -20,8 +20,16 @@ async def publish_diagnostic_request(diagnostic_instance: BaseModel | Mapping[st
     )
 
 
-async def publish_diagnostic_response(chat_id: str, file_id: int):
+async def publish_diagnostic_response(
+    chat_id: str,
+    file_id: int,
+    diagnostic_type: str | None = None,
+):
     await rmq_router.broker.publish(
-        message={"chat_id": chat_id, "file_id": file_id},
+        message={
+            "chat_id": chat_id,
+            "file_id": file_id,
+            "diagnostic_type": diagnostic_type,
+        },
         queue=settings.rmq.diagnostic_response_queue,
     )
