@@ -15,8 +15,10 @@ from service.diagnostic.publisher import (
 router = APIRouter(tags=["diagnostics"], prefix="/diagnostics")
 
 SessionDepends = Annotated[AsyncSession, Depends(database.get_session)]
+BASIC_DIAGNOSTIC_TAG = "#базовая_диагностика"
 EXPANDED_DIAGNOSTIC_TAG = "#расширенная_диагностика"
 INVISIBILITY_DIAGNOSTIC_TAG = "#диагностика_невидимости"
+BASIC_DIAGNOSTIC_TYPE = "basic"
 EXPANDED_DIAGNOSTIC_TYPE = "expanded"
 INVISIBILITY_DIAGNOSTIC_TYPE = "invisibility"
 
@@ -26,6 +28,8 @@ def _detect_diagnostic_type(description: str | None) -> str | None:
         return None
 
     tags = set(description.split())
+    if BASIC_DIAGNOSTIC_TAG in tags:
+        return BASIC_DIAGNOSTIC_TYPE
     if INVISIBILITY_DIAGNOSTIC_TAG in tags:
         return INVISIBILITY_DIAGNOSTIC_TYPE
     if EXPANDED_DIAGNOSTIC_TAG in tags:

@@ -65,6 +65,9 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      rabbitmq:
+        condition: service_healthy
+        required: false
       freeman-minio:
         condition: service_started
     dns:
@@ -79,6 +82,7 @@ services:
       retries: 5
       start_period: 10s
     restart: unless-stopped
+
 
   freeman-bot:
     build:

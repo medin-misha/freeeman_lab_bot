@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 broker = RabbitBroker(settings.rmq_url)
 _bot: Bot | None = None
+BASIC_DIAGNOSTIC_TYPE = "basic"
 EXPANDED_DIAGNOSTIC_TYPE = "expanded"
 INVISIBILITY_DIAGNOSTIC_TYPE = "invisibility"
 
@@ -53,7 +54,7 @@ async def handle_diagnostic_response(message: object) -> None:
                 filename=downloaded_file.filename,
             ),
         )
-        if diagnostic_type != INVISIBILITY_DIAGNOSTIC_TYPE:
+        if diagnostic_type not in {BASIC_DIAGNOSTIC_TYPE, INVISIBILITY_DIAGNOSTIC_TYPE}:
             await _bot.send_video(
                 chat_id=chat_id,
                 video=FSInputFile(path=settings.files.diagnostic_result_video),
@@ -130,6 +131,15 @@ def _extract_diagnostic_type(message: object) -> str | None:
 
 
 def _get_result_message_text(diagnostic_type: str | None) -> str:
+    if diagnostic_type == BASIC_DIAGNOSTIC_TYPE:
+        return settings.message.text.get(
+            "basic_diagnostic_result_ready",
+            settings.message.text.get(
+                "invisibility_diagnostic_result_ready",
+                settings.message.text.get("diagnostic_result_ready"),
+            ),
+        )
+
     if diagnostic_type == INVISIBILITY_DIAGNOSTIC_TYPE:
         return settings.message.text.get(
             "invisibility_diagnostic_result_ready",

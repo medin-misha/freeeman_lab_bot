@@ -10,6 +10,7 @@ from .buttons import (
     diagnostic_menu_reply_keyboard,
     diagnostic_sent_reply_keyboard,
     expanded_diagnostic_ready_reply_keyboard,
+    expanded_diagnostic_unavailable_reply_keyboard,
     expanded_diagnostic_upload_reply_keyboard,
 )
 from core.utils.api import DiagnosticsAPI
@@ -19,6 +20,7 @@ from core.utils import check_sub_channel_dec, ensure_user_registered
 
 router = Router(name="diagnostics_handlers")
 MAX_DIAGNOSTIC_FILE_SIZE = 1000 * 1024 * 1024
+BASIC_DIAGNOSTIC_TAG = "#базовая_диагностика"
 EXPANDED_DIAGNOSTIC_TAG = "#расширенная_диагностика"
 INVISIBILITY_DIAGNOSTIC_TAG = "#диагностика_невидимости"
 
@@ -156,6 +158,7 @@ async def _start_tagged_diagnostic(
     diagnostic_tag: str,
     instruction_path: str,
     include_intro_video: bool = True,
+    start_message_key: str = "expanded_diagnostic_start",
 ) -> None:
     await state.clear()
     await state.update_data({"diagnostic_tag": diagnostic_tag})
@@ -170,8 +173,29 @@ async def _start_tagged_diagnostic(
         document=FSInputFile(path=instruction_path),
     )
     await msg.answer(
-        text=settings.message.text.get("expanded_diagnostic_start"),
+        text=settings.message.text.get(start_message_key),
         reply_markup=expanded_diagnostic_ready_reply_keyboard(),
+    )
+
+
+@router.message(
+    StateFilter(DiagnosticStates.waiting_for_diagnostic_type),
+    F.text.lower() == "базовая диагностика",
+)
+@router.message(
+    StateFilter(DiagnosticStates.waiting_for_diagnostic_type),
+    F.text.lower() == "базовая диагностиĸа",
+)
+@ensure_user_registered
+@check_sub_channel_dec
+async def basic_diagnostic_type_selected_handler(
+    msg: types.Message,
+    state: FSMContext,
+):
+    await _continue_after_diagnostic_type_selected(
+        msg=msg,
+        state=state,
+        diagnostic_tag=BASIC_DIAGNOSTIC_TAG,
     )
 
 
@@ -185,10 +209,9 @@ async def expanded_diagnostic_type_selected_handler(
     msg: types.Message,
     state: FSMContext,
 ):
-    await _continue_after_diagnostic_type_selected(
-        msg=msg,
-        state=state,
-        diagnostic_tag=EXPANDED_DIAGNOSTIC_TAG,
+    await msg.answer(
+        text=settings.message.text.get("expanded_diagnostic_unavailable"),
+        reply_markup=expanded_diagnostic_unavailable_reply_keyboard(),
     )
 
 
@@ -216,14 +239,18 @@ async def diagnostic_menu_handler(msg: types.Message, state: FSMContext):
     await _send_diagnostic_menu(msg, state)
 
 
+@router.message(F.text.lower() == "базовая диагностика")
 @router.message(F.text.lower() == "базовая диагностиĸа")
 @ensure_user_registered
 @check_sub_channel_dec
 async def basic_diagnostic_handler(msg: types.Message, state: FSMContext):
-    await state.clear()
-    await msg.answer(
-        text=settings.message.text.get("basic_diagnostic_intro"),
-        reply_markup=basic_diagnostic_reply_keyboard(),
+    await _start_tagged_diagnostic(
+        msg=msg,
+        state=state,
+        diagnostic_tag=BASIC_DIAGNOSTIC_TAG,
+        instruction_path=settings.files.basic_diagnostic_file_pdf,
+        include_intro_video=False,
+        start_message_key="basic_diagnostic_start",
     )
 
 
@@ -249,11 +276,10 @@ async def back_to_diagnostic_handler(msg: types.Message, state: FSMContext):
 @ensure_user_registered
 @check_sub_channel_dec
 async def expanded_diagnostic_start_handler(msg: types.Message, state: FSMContext):
-    await _start_tagged_diagnostic(
-        msg=msg,
-        state=state,
-        diagnostic_tag=EXPANDED_DIAGNOSTIC_TAG,
-        instruction_path=settings.files.analysis_file_pdf,
+    await state.clear()
+    await msg.answer(
+        text=settings.message.text.get("expanded_diagnostic_unavailable"),
+        reply_markup=expanded_diagnostic_unavailable_reply_keyboard(),
     )
 
 
