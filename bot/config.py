@@ -10,8 +10,8 @@ class Messages:
         text: dict = json.load(f)
 
 class Files:
-    scale_file_pdf: str = BASE_DIR / "files" / "documents" / "Потолок_внутри_код_расширения_Методичка_апрель.pdf"
-    scale_file_epub: str = BASE_DIR / "files" / "documents" / "Потолок_внутри_код_расширения_Методичка_апрель.epub"
+    scale_file_pdf: str = BASE_DIR / "files" / "documents" / "Методичка_Потолок_внутри_код_расширения_апрель.pdf"
+    scale_file_epub: str = BASE_DIR / "files" / "documents" / "Методичка_Потолок_внутри_код_расширения_апрель.epub"
     scale_file_video: str = BASE_DIR / "files" / "videos" / "sircle2.mp4"
     expanded_diagnostic_video: str = BASE_DIR / "files" / "videos" / "sircle3.mp4"
     expanded_diagnostic_intro_video: str = BASE_DIR / "files" / "videos" / "sircle4.mp4"
