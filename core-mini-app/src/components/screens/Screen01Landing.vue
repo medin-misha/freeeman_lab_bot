@@ -14,7 +14,7 @@ const goTo = inject('goTo')
         <div class="video-shell">
           <div class="video-wrap">
             <iframe
-              src="https://rutube.ru/play/embed/6d6df53a0c4406832c7b4f38d3198c57/"
+              src="https://rutube.ru/play/embed/f3f760fd882135480fabb2a0f5469a47/"
               allow="clipboard-write; autoplay; fullscreen"
               allowfullscreen
               title="Видео"
