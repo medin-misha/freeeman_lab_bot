@@ -70,7 +70,7 @@ async def send_analysis_schedule_intro(
     )
 
 
-@router.message(F.text.lower() == "пойти в разбор")
+@router.message(F.text.lower().in_(("пойти в разбор", "разбор")))
 @ensure_user_registered
 async def analysis_entry_handler(msg: Message, state: FSMContext) -> None:
     await state.clear()

@@ -5,6 +5,7 @@ def start_reply_keyboard() -> ReplyKeyboardMarkup:
         keyboard=[
             [KeyboardButton(text="Забрать методичĸу"),],
             [KeyboardButton(text="Пройти диагностиĸу"),],
+            [KeyboardButton(text="Разбор"),],
             [KeyboardButton(text="Ядро"),],
             [KeyboardButton(text="Еще возможности"),],
         ]
