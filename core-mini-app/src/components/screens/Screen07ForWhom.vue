@@ -8,9 +8,15 @@ const goTo = inject('goTo')
 <template>
   <section class="screen">
     <div class="screen-inner">
-      <HeroLogo />
       <div class="content-card">
-        <h2>Кому подходит Ядро</h2>
+        <div class="hero-logo-stack">
+          <div class="hero-logo-shell">
+            <HeroLogo />
+          </div>
+          <div class="screen-kicker center">07 — Для кого</div>
+        </div>
+        <h2 class="section-heading">Кому подходит Ядро</h2>
+        <div class="section-divider"><span></span></div>
         <div class="list-block">
           <div class="list-item"><span class="bullet">▪️</span><span>Тем, кто устал всё понимать, но мало менять</span></div>
           <div class="list-item"><span class="bullet">▪️</span><span>Тем, кто чувствует, что их потенциал выше текущей жизни</span></div>
@@ -19,7 +25,7 @@ const goTo = inject('goTo')
           <div class="list-item"><span class="bullet">▪️</span><span>Тем, кто хочет расти не только в деньгах, но и в качестве личности</span></div>
         </div>
 
-        <h3 style="margin-top: 26px;">Кому не подойдёт</h3>
+        <h3 style="margin-top: 26px; text-align: center;">Кому не подойдёт</h3>
         <div class="list-block">
           <div class="list-item"><span class="bullet">▪️</span><span>Тем, кто ищет волшебную таблетку</span></div>
           <div class="list-item"><span class="bullet">▪️</span><span>Тем, кто хочет просто "послушать что-нибудь полезное"</span></div>

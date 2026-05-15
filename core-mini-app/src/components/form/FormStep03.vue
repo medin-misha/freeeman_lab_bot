@@ -27,8 +27,11 @@ function next() {
     <div class="screen-inner">
       <div class="content-card">
         <FormHeader :step="3" />
-        <h3>Приоритеты роста</h3>
-        <p class="muted">Что для тебя сейчас важнее всего усилить?</p>
+        <div class="form-intro">
+          <div class="form-kicker">Шаг 03</div>
+          <h3>Приоритеты роста</h3>
+          <p class="form-subtitle">Что для тебя сейчас важнее всего усилить?</p>
+        </div>
         <div class="selection-grid two-col">
           <SelectionCard
             v-for="opt in options"

@@ -38,7 +38,11 @@ async function handleSubmit() {
     <div class="screen-inner">
       <div class="content-card">
         <FormHeader :step="6" />
-        <h3>Готовность к формату</h3>
+        <div class="form-intro">
+          <div class="form-kicker">Шаг 06</div>
+          <h3>Готовность к формату</h3>
+          <p class="form-subtitle">Финальный шаг — как ты планируешь быть в процессе.</p>
+        </div>
 
         <div class="question-block">
           <div class="question-title">Готовность быть в процессе</div>

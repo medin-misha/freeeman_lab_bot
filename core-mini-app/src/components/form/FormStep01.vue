@@ -20,7 +20,11 @@ function next() {
     <div class="screen-inner">
       <div class="content-card">
         <FormHeader :step="1" />
-        <h3>База</h3>
+        <div class="form-intro">
+          <div class="form-kicker">Шаг 01</div>
+          <h3>База</h3>
+          <p class="form-subtitle">Несколько фактов, чтобы я понимал, кто заходит.</p>
+        </div>
         <div class="field-group">
           <label class="field-label" for="full_name">Имя</label>
           <input class="input" type="text" id="full_name" v-model="formData.full_name" placeholder="Введите имя" />

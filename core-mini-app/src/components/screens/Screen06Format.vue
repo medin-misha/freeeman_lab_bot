@@ -8,11 +8,19 @@ const goTo = inject('goTo')
 <template>
   <section class="screen">
     <div class="screen-inner">
-      <HeroLogo />
       <div class="content-card">
-        <h2>Как устроена работа внутри</h2>
-        <p>Формат Ядра строится не вокруг пассивного потребления, а вокруг включённости.</p>
-        <p>Внутри тебя ждёт не просто контент, а рабочая среда, где есть ритм, отражение, практика, сопровождение и движение по ключевым зонам роста.</p>
+        <div class="hero-logo-stack">
+          <div class="hero-logo-shell">
+            <HeroLogo />
+          </div>
+          <div class="screen-kicker center">06 — Формат работы</div>
+        </div>
+        <h2 class="section-heading">Как устроена работа внутри</h2>
+        <div class="section-divider"><span></span></div>
+        <div class="section-copy">
+          <p>Формат Ядра строится не вокруг пассивного потребления, а вокруг включённости.</p>
+          <p>Внутри тебя ждёт не просто контент, а рабочая среда, где есть ритм, отражение, практика, сопровождение и движение по ключевым зонам роста.</p>
+        </div>
         <div class="list-block">
           <div class="list-item"><span class="bullet">▪️</span><span>Еженедельные живые эфиры</span></div>
           <div class="list-item"><span class="bullet">▪️</span><span>Практики и задания на внедрение</span></div>

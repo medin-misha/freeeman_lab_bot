@@ -20,7 +20,11 @@ function next() {
     <div class="screen-inner">
       <div class="content-card">
         <FormHeader :step="4" />
-        <h3>Мотивация</h3>
+        <div class="form-intro">
+          <div class="form-kicker">Шаг 04</div>
+          <h3>Мотивация</h3>
+          <p class="form-subtitle">Почему тебе важно попасть в Ядро именно сейчас, а не когда-нибудь потом?</p>
+        </div>
         <div class="field-group">
           <label class="field-label" for="motivation">Почему тебе важно попасть в Ядро именно сейчас, а не когда-нибудь потом?</label>
           <textarea
